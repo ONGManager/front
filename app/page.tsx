@@ -1,22 +1,31 @@
-import Image from 'next/image';
-import Logo from './assets/Logo.png';
-import { Button } from '@mui/material';
+  import { Button } from '@mui/material';
+import LoginPadrao from './components/Login';
 
 export default function Home() {
   return (
-    <main className="h-screen align-middle flex flex-col justify-center items-center">
-      
-      <Image src={Logo} alt="Logo ONG Manager" width={300} height={50}/>
-      
+    <main className="min-h-screen align-middle flex flex-col justify-center items-center">
       <div className='flex flex-col items-center justify-center'>
-        <h1 className='text-6xl font-bold text-center text-purple-800'>Bem-vindo de volta!</h1>
-        <br />
-        <p className='text-gray-700 text-xl'>Entre na sua conta para gerenciar sua ONG</p>
-        <div className='flex flex-col items-center justify-center my-8 mx-auto w-125 h-75 bg-white rounded-lg shadow-md p-6'>
-          <Button variant="contained" className='bg-purple-600! hover:bg-purple-700! w-90 '>Entrar</Button>
+        <LoginPadrao Titulo="Bem-vindo de volta!" Subtitulo="Entre na sua conta para gerenciar sua ONG" />
+        <div className='flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 h-78 bg-white border border-gray-300 rounded-2xl shadow-2xl p-8'>
+          <div className='w-80'>
+            <span className='block text-start'>E-mail</span>
+            <form className='flex flex-col my-2 mb-6'>
+              <input type="email" placeholder='Digite seu e-mail' className='w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 ' />
+            </form>
+          </div>
+          <div className='w-80'>
+            <span className='block text-start'>Senha</span>
+            <form className='flex flex-col my-2 mb-8'>
+              <input type="password" placeholder='Digite sua senha' className='w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600' />
+              <a href='/forgot-password' className='text-purple-600 font-bold hover:text-purple-800 cursor-pointer block text-right'>Esqueceu a senha?</a>
+            </form>
+          </div>
+          <div className=''>
+            <Button variant="contained" color="primary" href="/OngSelector" className='w-80 h-10 bg-purple-600! hover:bg-purple-700! text-white'>Entrar</Button>
+          </div>
         </div>
         <div className='flex'>
-          <p className='text-gray-700 text-xl align-middle'>Ainda não tem um conta?</p>
+          <p className='SubTitulo'>Ainda não tem um conta?</p>
           <a href="/register" className='text-xl text-purple-600 font-bold hover:text-purple-800 ml-2'>Criar minha ONG</a>
         </div>
       </div>
