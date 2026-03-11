@@ -12,7 +12,7 @@ export default function OngSelector() {
                         <input type="email" placeholder='Sua ONG' className='w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 ' />
                     </form>
                 </div>
-                <Button variant="contained" color="primary" href="/OngSelector" className='w-80 h-10 bg-purple-600! hover:bg-purple-700! text-white font-bold'>Entrar</Button>
+                <Button variant="contained" color="primary" href="/dashboard" className='w-80 h-10 bg-purple-600! hover:bg-purple-700! text-white font-bold'>Entrar</Button>
             </div>
             <div className='flex'>
                 <p className='SubTitulo'>Ainda não tem um conta?</p>
