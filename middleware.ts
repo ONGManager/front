@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server';
-import { auth } from './auth';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default auth((req) => {
-  if (!req.auth) {
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get('token');
+
+  if (!token) {
     return NextResponse.redirect(new URL('/', req.url));
   }
+
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ['/OngSelector/:path*', '/dashboard/:path*'],

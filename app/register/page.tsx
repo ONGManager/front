@@ -6,12 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterOngSchema, type RegisterOngFormData, aplicarMascaraCNPJ } from '@/schema';
 import LoginPadrao from "../components/Login";
 import Button from "@mui/material/Button";
-import Alert from "@mui/material/Alert";
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
+import { registerApi } from '../lib/api';
+import { toast } from 'sonner';
 
 export default function Register() {
-  const [submitError, setSubmitError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
@@ -58,21 +58,13 @@ export default function Register() {
   const onSubmit = async (data: RegisterOngFormData) => {
     try {
       setIsLoading(true);
-      setSubmitError('');
-      
-      // Aqui você chamaria sua API
-      console.log('Dados validados:', data);
-      
-      // Exemplo de chamada de API:
-      // const response = await fetch('/api/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data),
-      // });
-      
-      alert('Cadastro realizado com sucesso!');
+
+      await registerApi(data.nomeResponsavel, data.email, data.password);
+
+      toast.success('Conta criada com sucesso! Faça login para continuar.');
+      window.location.href = '/';
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Erro ao cadastrar');
+      toast.error(error instanceof Error ? error.message : 'Erro ao cadastrar. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -88,12 +80,6 @@ export default function Register() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start py-8">
       <LoginPadrao Titulo="Crie sua Conta!" Subtitulo="Cadastre sua ONG e comece a gerenciar em minutos" />
-      
-      {submitError && (
-        <Alert severity="error" className="w-80 mb-4">
-          {submitError}
-        </Alert>
-      )}
 
       <div className='flex flex-col items-center justify-center mt-4 mb-2 mx-auto w-98 bg-white rounded-2xl shadow-2xl p-6'>
         <div className="w-80 mb-4">
@@ -321,7 +307,6 @@ export default function Register() {
                   variant="contained" 
                   color="primary" 
                   type="submit"
-                  href='/dashboard'
                   disabled={isLoading}
                   className='w-1/2 h-10 bg-purple-600! hover:bg-purple-700! text-white font-bold'
                 >

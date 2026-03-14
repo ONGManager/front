@@ -1,34 +1,30 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 import { Button } from '@mui/material';
 import LoginPadrao from './components/Login';
+import { loginApi } from './lib/api';
+import { toast } from 'sonner';
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const searchParams = useSearchParams();
-  const errorMessage = useMemo(() => {
-    const error = searchParams.get('error');
-    if (!error) return '';
-    if (error === 'CredentialsSignin') return 'E-mail ou senha inválidos.';
-    return 'Não foi possível entrar. Tente novamente.';
-  }, [searchParams]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    await signIn('credentials', {
-      email,
-      password,
-      redirect: true,
-      callbackUrl: '/OngSelector',
-    });
-    setIsSubmitting(false);
+
+    try {
+      await loginApi(email, password);
+      toast.success('Login realizado com sucesso!');
+      window.location.href = '/OngSelector';
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'E-mail ou senha inválidos.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -88,9 +84,6 @@ export default function Home() {
               <a href='/forgot-password' className='text-purple-600 font-bold hover:text-purple-800 cursor-pointer block text-right'>Esqueceu a senha?</a>
             </div>
           </div>
-          {errorMessage ? (
-            <p className='text-red-600 text-sm mb-4 w-80 text-left'>{errorMessage}</p>
-          ) : null}
           <div className=''>
             <Button
               variant="contained"
@@ -104,7 +97,7 @@ export default function Home() {
           </div>
         </form>
         <div className='flex'>
-          <p className='SubTitulo'>Ainda nÃ£o tem um conta?</p>
+          <p className='SubTitulo'>Ainda não tem uma conta?</p>
           <a href="/register" className='text-xl text-purple-600 font-bold hover:text-purple-800 ml-2'>Criar minha ONG</a>
         </div>
       </div>
