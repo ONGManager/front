@@ -8,11 +8,11 @@ import {
   type RegisterOngFormData,
   aplicarMascaraCNPJ,
 } from "@/schema";
-import LoginPadrao from "../components/Login";
+import LoginPadrao from "../../../components/Login";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { registerApi } from "../lib/api";
+import { registerApi } from "../../../services/authService";
 import { toast } from "sonner";
 
 export default function Register() {

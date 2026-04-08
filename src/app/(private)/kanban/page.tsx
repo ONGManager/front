@@ -21,10 +21,9 @@ import {
   updateTaskStatusApi,
   deleteKanbanTaskApi,
   updateKanbanTaskApi,
-  getOngMembersApi,
-  getOngApi,
   KanbanTask,
-} from "../lib/api";
+} from "@/src/services/kanbanService";
+import { getOngMembersApi, getOngApi } from "@/src/services/ongService";
 
 interface Member {
   id: string;
@@ -36,6 +35,7 @@ interface Member {
 const statusLabels: Record<string, string> = {
   a_fazer: "A Fazer",
   em_andamento: "Em Andamento",
+  aguardando_aprovacao: "Aguardando Aprovação",
   concluido: "Concluído",
 };
 
@@ -128,23 +128,33 @@ export default function KanbanPage() {
 
     try {
       if (editingTask) {
-        const updated = await updateKanbanTaskApi(ongId, editingTask.id, {
+        const payload = {
           title,
           description,
           priority,
           deadline: deadline ? new Date(deadline).toISOString() : undefined,
           assignedToId: assignedToId || undefined,
+        };
+        console.log("[KANBAN_FORM][UPDATE] payload:", payload);
+        console.log("[KANBAN_FORM][UPDATE] payload typeof:", typeof payload);
+
+        const updated = await updateKanbanTaskApi(ongId, editingTask.id, {
+          ...payload,
         });
         setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
         toast.success("Tarefa atualizada!");
       } else {
-        const newTask = await createKanbanTaskApi(ongId, {
+        const payload = {
           title,
           description,
           priority,
           deadline: deadline ? new Date(deadline).toISOString() : undefined,
           assignedToId: assignedToId || undefined,
-        });
+        };
+        console.log("[KANBAN_FORM][CREATE] payload:", payload);
+        console.log("[KANBAN_FORM][CREATE] payload typeof:", typeof payload);
+
+        const newTask = await createKanbanTaskApi(ongId, payload);
         setTasks([...tasks, newTask]);
         toast.success("Tarefa criada!");
       }
@@ -175,11 +185,25 @@ export default function KanbanPage() {
   };
 
   const handleDrop = async (
-    status: "a_fazer" | "em_andamento" | "concluido",
+    status: "a_fazer" | "em_andamento" | "aguardando_aprovacao" | "concluido",
   ) => {
     if (!draggedTask || draggedTask.status === status) {
       setDraggedTask(null);
       return;
+    }
+
+    // Voluntário não pode mover para concluído ou a_fazer
+    if (!isAdmin) {
+      if (status === "concluido") {
+        toast.error("Apenas admins podem marcar como concluído");
+        setDraggedTask(null);
+        return;
+      }
+      if (status === "a_fazer") {
+        toast.error("Voluntários não podem mover tarefas para A Fazer");
+        setDraggedTask(null);
+        return;
+      }
     }
 
     try {
@@ -187,133 +211,124 @@ export default function KanbanPage() {
       setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
       toast.success("Status atualizado!");
     } catch (err) {
-      toast.error("Erro ao atualizar status");
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao atualizar status",
+      );
     } finally {
       setDraggedTask(null);
     }
   };
 
   const columns: {
-    key: "a_fazer" | "em_andamento" | "concluido";
+    key: "a_fazer" | "em_andamento" | "aguardando_aprovacao" | "concluido";
     color: string;
   }[] = [
     { key: "a_fazer", color: "border-gray-400" },
     { key: "em_andamento", color: "border-blue-400" },
+    { key: "aguardando_aprovacao", color: "border-yellow-400" },
     { key: "concluido", color: "border-green-400" },
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <p>Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Kanban</h1>
-            <p className="text-gray-600">Gerencie as tarefas da sua ONG</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outlined"
-              onClick={() => router.push("/dashboard")}
-            >
-              Voltar
-            </Button>
-            {isAdmin && (
-              <Button
-                variant="contained"
-                onClick={openCreateModal}
-                className="bg-purple-600! hover:bg-purple-700!"
-              >
-                Nova Tarefa
-              </Button>
-            )}
-          </div>
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Tarefas</h1>
+          <p className="text-gray-600">Gerencie as tarefas da sua ONG</p>
         </div>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            onClick={openCreateModal}
+            className="bg-purple-600! hover:bg-purple-700!"
+          >
+            Nova Tarefa
+          </Button>
+        )}
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {columns.map(({ key, color }) => (
-            <div
-              key={key}
-              className={`bg-white rounded-lg shadow p-4 border-t-4 ${color}`}
-              onDragOver={handleDragOver}
-              onDrop={() => handleDrop(key)}
-            >
-              <h2 className="font-semibold text-lg mb-4 text-gray-700">
-                {statusLabels[key]}
-                <span className="ml-2 text-sm text-gray-400">
-                  ({tasks.filter((t) => t.status === key).length})
-                </span>
-              </h2>
-              <div className="space-y-3 min-h-[200px]">
-                {tasks
-                  .filter((t) => t.status === key)
-                  .map((task) => (
-                    <div
-                      key={task.id}
-                      draggable
-                      onDragStart={() => handleDragStart(task)}
-                      className="bg-gray-50 rounded-lg p-3 border border-gray-200 cursor-move hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-gray-800">
-                          {task.title}
-                        </h3>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${priorityColors[task.priority]}`}
-                        >
-                          {priorityLabels[task.priority]}
-                        </span>
-                      </div>
-                      {task.description && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                          {task.description}
-                        </p>
-                      )}
-                      <div className="flex justify-between items-center text-xs text-gray-500">
-                        <div>
-                          {task.assignedTo && (
-                            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                              {task.assignedTo.name}
-                            </span>
-                          )}
-                        </div>
-                        {task.deadline && (
-                          <span className="text-gray-400">
-                            {new Date(task.deadline).toLocaleDateString(
-                              "pt-BR",
-                            )}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {columns.map(({ key, color }) => (
+          <div
+            key={key}
+            className={`bg-white rounded-lg shadow p-4 border-t-4 ${color}`}
+            onDragOver={handleDragOver}
+            onDrop={() => handleDrop(key)}
+          >
+            <h2 className="font-semibold text-lg mb-4 text-gray-700">
+              {statusLabels[key]}
+              <span className="ml-2 text-sm text-gray-400">
+                ({tasks.filter((t) => t.status === key).length})
+              </span>
+            </h2>
+            <div className="space-y-3 min-h-[200px]">
+              {tasks
+                .filter((t) => t.status === key)
+                .map((task) => (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={() => handleDragStart(task)}
+                    className="bg-gray-50 rounded-lg p-3 border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-gray-800">
+                        {task.title}
+                      </h3>
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${priorityColors[task.priority]}`}
+                      >
+                        {priorityLabels[task.priority]}
+                      </span>
+                    </div>
+                    {task.description && (
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        {task.description}
+                      </p>
+                    )}
+                    <div className="flex justify-between items-center text-xs text-gray-500">
+                      <div>
+                        {task.assignedTo && (
+                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                            {task.assignedTo.name}
                           </span>
                         )}
                       </div>
-                      {isAdmin && (
-                        <div className="flex justify-end gap-1 mt-2">
-                          <button
-                            onClick={() => openEditModal(task)}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => handleDelete(task.id)}
-                            className="text-red-600 hover:text-red-800 text-sm ml-2"
-                          >
-                            Excluir
-                          </button>
-                        </div>
+                      {task.deadline && (
+                        <span className="text-gray-400">
+                          {new Date(task.deadline).toLocaleDateString("pt-BR")}
+                        </span>
                       )}
                     </div>
-                  ))}
-              </div>
+                    {isAdmin && (
+                      <div className="flex justify-end gap-1 mt-2">
+                        <button
+                          onClick={() => openEditModal(task)}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(task.id)}
+                          className="text-red-600 hover:text-red-800 text-sm ml-2"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
       {/* Modal de criar/editar tarefa */}
@@ -374,8 +389,8 @@ export default function KanbanPage() {
                 <MenuItem value="">Ninguém</MenuItem>
                 {members.map((m) => (
                   <MenuItem key={m.user.id} value={m.user.id}>
-                    {m.user.name} (
-                    {m.role === "admin" ? "Admin" : "Colaborador"})
+                    {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"}
+                    )
                   </MenuItem>
                 ))}
               </Select>

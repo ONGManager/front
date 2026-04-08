@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
-import LoginPadrao from "./components/Login";
-import { loginApi, getMeApi } from "./lib/api";
+import LoginPadrao from "../components/Login";
+import { loginApi, getMeApi } from "../services/authService";
 import { toast } from "sonner";
 
 export default function Home() {

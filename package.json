@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
     "@mui/material": "^7.3.8",
+    "axios": "^1.15.0",
     "framer-motion": "^11.0.0",
     "motion": "^12.35.2",
     "next": "^15.0.0",

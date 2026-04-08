@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import LoginPadrao from "../components/Login";
+import LoginPadrao from "../../../components/Login";
 import Button from "@mui/material/Button";
-import { getMyOngsApi } from "../lib/api";
+import { getMyOngsApi } from "../../../services/ongService";
 import { toast } from "sonner";
 
 interface Ong {
