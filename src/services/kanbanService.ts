@@ -13,6 +13,30 @@ export interface KanbanTask {
   updatedAt: string;
 }
 
+export interface TaskHistoryEntry {
+  id: string;
+  taskId: string;
+  action: "created" | "updated" | "status_changed";
+  actor?: { id: string; name: string; email: string } | null;
+  previousStatus?:
+    | "a_fazer"
+    | "em_andamento"
+    | "aguardando_aprovacao"
+    | "concluido"
+    | null;
+  newStatus?:
+    | "a_fazer"
+    | "em_andamento"
+    | "aguardando_aprovacao"
+    | "concluido"
+    | null;
+  createdAt: string;
+}
+
+export interface KanbanTaskDetails extends KanbanTask {
+  history: TaskHistoryEntry[];
+}
+
 export async function getKanbanTasksApi(ongId: string): Promise<KanbanTask[]> {
   try {
     const { data } = await api.get(`/ong/${ongId}/kanban`);
@@ -64,12 +88,26 @@ export async function updateKanbanTaskApi(
   }>,
 ): Promise<KanbanTask> {
   try {
-    const response = await api.patch(`/ong/${ongId}/kanban/${taskId}`, data, {
+    const response = await api.put(`/ong/${ongId}/kanban/${taskId}`, data, {
       headers: { "Content-Type": "application/json" },
     });
     return response.data;
   } catch (error) {
     throw new Error(getApiErrorMessage(error, "Erro ao atualizar tarefa"));
+  }
+}
+
+export async function getKanbanTaskDetailsApi(
+  ongId: string,
+  taskId: string,
+): Promise<KanbanTaskDetails> {
+  try {
+    const { data } = await api.get(`/ong/${ongId}/kanban/${taskId}`);
+    return data;
+  } catch (error) {
+    throw new Error(
+      getApiErrorMessage(error, "Erro ao buscar detalhes da tarefa"),
+    );
   }
 }
 

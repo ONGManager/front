@@ -17,11 +17,13 @@ import {
 import { toast } from "sonner";
 import {
   getKanbanTasksApi,
+  getKanbanTaskDetailsApi,
   createKanbanTaskApi,
   updateTaskStatusApi,
   deleteKanbanTaskApi,
   updateKanbanTaskApi,
   KanbanTask,
+  KanbanTaskDetails,
 } from "@/src/services/kanbanService";
 import { getOngMembersApi, getOngApi } from "@/src/services/ongService";
 
@@ -53,6 +55,12 @@ const priorityColors: Record<string, string> = {
   urgente: "bg-red-200 text-red-700",
 };
 
+const historyActionLabels: Record<string, string> = {
+  created: "criada",
+  updated: "atualizada",
+  status_changed: "status alterado",
+};
+
 export default function KanbanPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<KanbanTask[]>([]);
@@ -61,6 +69,10 @@ export default function KanbanPage() {
   const [userRole, setUserRole] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [selectedTaskDetails, setSelectedTaskDetails] =
+    useState<KanbanTaskDetails | null>(null);
   const [editingTask, setEditingTask] = useState<KanbanTask | null>(null);
   const [draggedTask, setDraggedTask] = useState<KanbanTask | null>(null);
 
@@ -99,6 +111,19 @@ export default function KanbanPage() {
   };
 
   const isAdmin = userRole === "admin";
+
+  const isTaskOverdue = (task: KanbanTask) => {
+    if (!task.deadline || task.status === "concluido") {
+      return false;
+    }
+
+    const nowInSaoPaulo = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }),
+    );
+    const deadlineDate = new Date(task.deadline);
+
+    return deadlineDate.getTime() < nowInSaoPaulo.getTime();
+  };
 
   const openCreateModal = () => {
     setEditingTask(null);
@@ -178,6 +203,25 @@ export default function KanbanPage() {
 
   const handleDragStart = (task: KanbanTask) => {
     setDraggedTask(task);
+  };
+
+  const handleOpenDetails = async (taskId: string) => {
+    try {
+      setDetailsLoading(true);
+      setDetailsModalOpen(true);
+
+      const details = await getKanbanTaskDetailsApi(ongId, taskId);
+      setSelectedTaskDetails(details);
+    } catch (err) {
+      setDetailsModalOpen(false);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Erro ao carregar detalhes da tarefa",
+      );
+    } finally {
+      setDetailsLoading(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -277,7 +321,12 @@ export default function KanbanPage() {
                     key={task.id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
-                    className="bg-gray-50 rounded-lg p-3 border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                    onClick={() => handleOpenDetails(task.id)}
+                    className={`rounded-lg p-3 border cursor-move hover:shadow-md transition-shadow ${
+                      isTaskOverdue(task)
+                        ? "bg-red-50 border-red-300"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-medium text-gray-800">
@@ -301,6 +350,11 @@ export default function KanbanPage() {
                             {task.assignedTo.name}
                           </span>
                         )}
+                        {isTaskOverdue(task) && (
+                          <span className="ml-2 bg-red-100 text-red-700 px-2 py-1 rounded font-semibold">
+                            Atrasada
+                          </span>
+                        )}
                       </div>
                       {task.deadline && (
                         <span className="text-gray-400">
@@ -311,13 +365,19 @@ export default function KanbanPage() {
                     {isAdmin && (
                       <div className="flex justify-end gap-1 mt-2">
                         <button
-                          onClick={() => openEditModal(task)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(task);
+                          }}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(task.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(task.id);
+                          }}
                           className="text-red-600 hover:text-red-800 text-sm ml-2"
                         >
                           Excluir
@@ -406,6 +466,98 @@ export default function KanbanPage() {
           >
             {editingTask ? "Salvar" : "Criar"}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Detalhes da Tarefa</DialogTitle>
+        <DialogContent>
+          {detailsLoading ? (
+            <p>Carregando detalhes...</p>
+          ) : selectedTaskDetails ? (
+            <div className="space-y-4 mt-2">
+              <div>
+                <h3 className="font-semibold text-lg text-gray-800">
+                  {selectedTaskDetails.title}
+                </h3>
+                {selectedTaskDetails.description && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedTaskDetails.description}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {statusLabels[selectedTaskDetails.status]}
+                </p>
+                <p>
+                  <strong>Prioridade:</strong>{" "}
+                  {priorityLabels[selectedTaskDetails.priority]}
+                </p>
+                <p>
+                  <strong>Prazo:</strong>{" "}
+                  {selectedTaskDetails.deadline
+                    ? new Date(selectedTaskDetails.deadline).toLocaleDateString(
+                        "pt-BR",
+                      )
+                    : "Sem prazo"}
+                </p>
+                <p>
+                  <strong>Responsável:</strong>{" "}
+                  {selectedTaskDetails.assignedTo?.name || "Não atribuído"}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-700 mb-2">Histórico</h4>
+                {selectedTaskDetails.history.length === 0 ? (
+                  <p className="text-sm text-gray-500">Sem histórico.</p>
+                ) : (
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {selectedTaskDetails.history.map((item) => (
+                      <div
+                        key={item.id}
+                        className="border border-gray-200 rounded p-2 text-sm bg-gray-50"
+                      >
+                        <p>
+                          <strong>Ação:</strong>{" "}
+                          {historyActionLabels[item.action] || item.action}
+                        </p>
+                        <p>
+                          <strong>Por:</strong> {item.actor?.name || "Sistema"}
+                        </p>
+                        <p>
+                          <strong>De:</strong>{" "}
+                          {item.previousStatus
+                            ? statusLabels[item.previousStatus]
+                            : "-"}
+                        </p>
+                        <p>
+                          <strong>Para:</strong>{" "}
+                          {item.newStatus ? statusLabels[item.newStatus] : "-"}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(item.createdAt).toLocaleString("pt-BR")}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p>Nenhum detalhe encontrado.</p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDetailsModalOpen(false)}>Fechar</Button>
         </DialogActions>
       </Dialog>
     </div>
