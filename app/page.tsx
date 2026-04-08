@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import LoginPadrao from './components/Login';
 import { loginApi } from './lib/api';
 import { toast } from 'sonner';
+import './globals.css';
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);

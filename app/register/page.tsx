@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { registerApi } from '../lib/api';
 import { toast } from 'sonner';
+import '../globals.css';
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
