@@ -1,12 +1,60 @@
 @import "tailwindcss";
 
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-border: #f3f4f6;
+  --surface-hover: #f9fafb;
+  --divider: #f3f4f6;
+  --text: #111827;
+  --muted: #6b7280;
+  --icon: #6b7280;
+  --accent: #7c3aed;
+  --accent-soft: #ede9fe;
+  --accent-border: #c4b5fd;
+  --input: #ffffff;
+  --input-border: #d1d5db;
+  --input-hover: #c4b5fd;
+  --input-ring: #7c3aed;
+  --table-head: #f9fafb;
+  --card-border: #e5e7eb;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --force-text: #000000;
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #111827;
+  --surface-border: #1f2937;
+  --surface-hover: #1f2937;
+  --divider: #1f2937;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --icon: #9ca3af;
+  --accent: #c4b5fd;
+  --accent-soft: #1e1b4b;
+  --accent-border: #4c1d95;
+  --input: #0f172a;
+  --input-border: #334155;
+  --input-hover: #4c1d95;
+  --input-ring: #c4b5fd;
+  --table-head: #0b1220;
+  --card-border: #1f2937;
+  --danger: #f87171;
+  --danger-soft: #3f1d1d;
+  --force-text: #ffffff;
+}
+
 /* Classes customizadas com Tailwind utilities */
 .Titulo {
-    @apply text-6xl font-bold text-center text-purple-800 mb-6;
+    @apply text-6xl font-bold text-center mb-6;
+    color: var(--accent);
 }
 
 .SubTitulo {
-  @apply text-gray-700 text-xl mb-4 text-center;
+  @apply text-xl mb-4 text-center;
+  color: var(--muted);
 }
 
 .ImagemLogo{

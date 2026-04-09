@@ -99,14 +99,14 @@ export default function Register() {
         Subtitulo="Cadastre sua ONG e comece a gerenciar em minutos"
       />
 
-      <div className="flex flex-col items-center justify-center mt-4 mb-2 mx-auto w-98 bg-white rounded-2xl shadow-2xl p-6">
+      <div className="flex flex-col items-center justify-center mt-4 mb-2 mx-auto w-98 bg-[var(--surface)] rounded-2xl shadow-2xl p-6">
         <div className="w-80 mb-4">
           <div className="flex items-center justify-between mb-2">
             <motion.div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                 step >= 1
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface-hover)] text-[var(--muted)]"
               }`}
               initial={false}
               animate={{ scale: step >= 1 ? 1 : 0.95 }}
@@ -114,9 +114,9 @@ export default function Register() {
             >
               1
             </motion.div>
-            <div className="flex-1 h-1 mx-3 bg-gray-200 rounded-full overflow-hidden">
+            <div className="flex-1 h-1 mx-3 bg-[var(--surface-hover)] rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-purple-600"
+                className="h-full bg-[var(--accent)]"
                 initial={false}
                 animate={{ width: step === 1 ? "50%" : "100%" }}
                 transition={{ type: "spring", stiffness: 160, damping: 22 }}
@@ -125,8 +125,8 @@ export default function Register() {
             <motion.div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                 step >= 2
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface-hover)] text-[var(--muted)]"
               }`}
               initial={false}
               animate={{ scale: step >= 2 ? 1 : 0.95 }}
@@ -135,7 +135,7 @@ export default function Register() {
               2
             </motion.div>
           </div>
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-[var(--muted)]">
             <span>ONG</span>
             <span>Conta</span>
           </div>
@@ -161,8 +161,10 @@ export default function Register() {
                     type="text"
                     placeholder="Digite o nome da sua ONG"
                     {...register("nomeOng")}
-                    className={`w-full h-10 border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
-                      errors.nomeOng ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
+                      errors.nomeOng
+                        ? "border-red-500"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   {errors.nomeOng && (
@@ -185,8 +187,10 @@ export default function Register() {
                       handleCNPJChange(e);
                     }}
                     maxLength={18}
-                    className={`w-full h-10 border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
-                      errors.cnpj ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
+                      errors.cnpj
+                        ? "border-red-500"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   {errors.cnpj && (
@@ -226,10 +230,10 @@ export default function Register() {
                     type="text"
                     placeholder="Digite o nome completo"
                     {...register("nomeResponsavel")}
-                    className={`w-full h-10 border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
                       errors.nomeResponsavel
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   {errors.nomeResponsavel && (
@@ -246,8 +250,10 @@ export default function Register() {
                     type="email"
                     placeholder="seu@email.com"
                     {...register("email")}
-                    className={`w-full h-10 border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
-                      errors.email ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
+                      errors.email
+                        ? "border-red-500"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   {errors.email && (
@@ -265,14 +271,16 @@ export default function Register() {
                     placeholder="Mínimo 8 caracteres"
                     {...register("password")}
                     onKeyDown={handleSenhaKeyDown}
-                    className={`w-full h-10 border-2 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
-                      errors.password ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
+                      errors.password
+                        ? "border-red-500"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-10.5 text-gray-500 hover:text-gray-700 text-sm"
+                    className="absolute right-3 top-10.5 text-[var(--muted)] hover:text-[var(--text)] text-sm"
                     aria-label={
                       showPassword ? "Ocultar senha" : "Mostrar senha"
                     }
@@ -319,16 +327,16 @@ export default function Register() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Repita sua senha"
                     {...register("confirmPassword")}
-                    className={`w-full h-10 border-2 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 transition ${
+                    className={`w-full h-10 bg-[var(--input)] text-[var(--text)] border-2 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition ${
                       errors.confirmPassword
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-[var(--input-border)]"
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((v) => !v)}
-                    className="absolute right-3 top-[42px] text-gray-500 hover:text-gray-700 text-sm"
+                    className="absolute right-3 top-[42px] text-[var(--muted)] hover:text-[var(--text)] text-sm"
                     aria-label={
                       showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
                     }
@@ -396,7 +404,7 @@ export default function Register() {
         <p className="SubTitulo">Já tem alguma ONG cadastrada?</p>
         <Link
           href="/"
-          className="text-purple-600 font-bold hover:text-purple-800 text-xl ml-2"
+          className="text-[var(--accent)] font-bold hover:opacity-80 text-xl ml-2"
         >
           Entrar na conta
         </Link>

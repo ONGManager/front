@@ -285,8 +285,10 @@ export default function KanbanPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Tarefas</h1>
-          <p className="text-gray-600">Gerencie as tarefas da sua ONG</p>
+          <h1 className="text-2xl font-bold text-[var(--text)]">Tarefas</h1>
+          <p className="text-[var(--muted)]">
+            Gerencie as tarefas da sua ONG
+          </p>
         </div>
         {isAdmin && (
           <Button
@@ -303,13 +305,13 @@ export default function KanbanPage() {
         {columns.map(({ key, color }) => (
           <div
             key={key}
-            className={`bg-white rounded-lg shadow p-4 border-t-4 ${color}`}
+            className={`bg-[var(--surface)] rounded-lg shadow p-4 border-t-4 ${color}`}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(key)}
           >
-            <h2 className="font-semibold text-lg mb-4 text-gray-700">
+            <h2 className="font-semibold text-lg mb-4 text-[var(--text)]">
               {statusLabels[key]}
-              <span className="ml-2 text-sm text-gray-400">
+              <span className="ml-2 text-sm text-[var(--muted)]">
                 ({tasks.filter((t) => t.status === key).length})
               </span>
             </h2>
@@ -324,12 +326,12 @@ export default function KanbanPage() {
                     onClick={() => handleOpenDetails(task.id)}
                     className={`rounded-lg p-3 border cursor-move hover:shadow-md transition-shadow ${
                       isTaskOverdue(task)
-                        ? "bg-red-50 border-red-300"
-                        : "bg-gray-50 border-gray-200"
+                        ? "bg-[var(--danger-soft)] border-[var(--danger)]"
+                        : "bg-[var(--surface-hover)] border-[var(--surface-border)]"
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-gray-800">
+                      <h3 className="font-medium text-[var(--text)]">
                         {task.title}
                       </h3>
                       <span
@@ -339,25 +341,25 @@ export default function KanbanPage() {
                       </span>
                     </div>
                     {task.description && (
-                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      <p className="text-sm text-[var(--muted)] mb-2 line-clamp-2">
                         {task.description}
                       </p>
                     )}
-                    <div className="flex justify-between items-center text-xs text-gray-500">
+                    <div className="flex justify-between items-center text-xs text-[var(--muted)]">
                       <div>
                         {task.assignedTo && (
-                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                          <span className="bg-[var(--accent-soft)] text-[var(--accent)] px-2 py-1 rounded">
                             {task.assignedTo.name}
                           </span>
                         )}
                         {isTaskOverdue(task) && (
-                          <span className="ml-2 bg-red-100 text-red-700 px-2 py-1 rounded font-semibold">
+                          <span className="ml-2 bg-[var(--danger-soft)] text-[var(--danger)] px-2 py-1 rounded font-semibold">
                             Atrasada
                           </span>
                         )}
                       </div>
                       {task.deadline && (
-                        <span className="text-gray-400">
+                        <span className="text-[var(--muted)]">
                           {new Date(task.deadline).toLocaleDateString("pt-BR")}
                         </span>
                       )}
@@ -369,7 +371,7 @@ export default function KanbanPage() {
                             e.stopPropagation();
                             openEditModal(task);
                           }}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="text-blue-600 hover:text-blue-800 text-sm border-2 p-2 border-blue-600 hover:bg-blue-200 rounded-xl bg-blue-200"
                         >
                           Editar
                         </button>
@@ -378,7 +380,7 @@ export default function KanbanPage() {
                             e.stopPropagation();
                             handleDelete(task.id);
                           }}
-                          className="text-red-600 hover:text-red-800 text-sm ml-2"
+                          className="text-red-600 hover:text-red-800 text-sm ml-2 border-2 p-2 border-red-600 hover:bg-red-200 rounded-xl bg-red-200"
                         >
                           Excluir
                         </button>
@@ -482,11 +484,11 @@ export default function KanbanPage() {
           ) : selectedTaskDetails ? (
             <div className="space-y-4 mt-2">
               <div>
-                <h3 className="font-semibold text-lg text-gray-800">
+                <h3 className="font-semibold text-lg text-[var(--text)]">
                   {selectedTaskDetails.title}
                 </h3>
                 {selectedTaskDetails.description && (
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-[var(--muted)] mt-1">
                     {selectedTaskDetails.description}
                   </p>
                 )}
@@ -516,15 +518,17 @@ export default function KanbanPage() {
               </div>
 
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">Histórico</h4>
+                <h4 className="font-semibold text-[var(--text)] mb-2">
+                  Histórico
+                </h4>
                 {selectedTaskDetails.history.length === 0 ? (
-                  <p className="text-sm text-gray-500">Sem histórico.</p>
+                  <p className="text-sm text-[var(--muted)]">Sem histórico.</p>
                 ) : (
                   <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {selectedTaskDetails.history.map((item) => (
                       <div
                         key={item.id}
-                        className="border border-gray-200 rounded p-2 text-sm bg-gray-50"
+                        className="border border-[var(--surface-border)] rounded p-2 text-sm bg-[var(--surface-hover)]"
                       >
                         <p>
                           <strong>Ação:</strong>{" "}
@@ -543,7 +547,7 @@ export default function KanbanPage() {
                           <strong>Para:</strong>{" "}
                           {item.newStatus ? statusLabels[item.newStatus] : "-"}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-[var(--muted)] mt-1">
                           {new Date(item.createdAt).toLocaleString("pt-BR")}
                         </p>
                       </div>

@@ -60,10 +60,10 @@ export default function OngSelector() {
         Titulo="Escolha a sua ONG"
         Subtitulo="Selecione qual você quer trabalhar!"
       ></LoginPadrao>
-      <div className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 min-h-50 bg-white border border-gray-300 rounded-2xl shadow-2xl p-8">
+      <div className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 min-h-50 bg-[var(--surface)] border border-[var(--card-border)] rounded-2xl shadow-2xl p-8">
         {ongs.length === 0 ? (
           <div className="text-center">
-            <p className="text-gray-600 mb-4">
+            <p className="text-[var(--muted)] mb-4">
               Você ainda não participa de nenhuma ONG.
             </p>
             <Button
@@ -78,11 +78,13 @@ export default function OngSelector() {
         ) : (
           <>
             <div className="w-80">
-              <span className="block text-start mb-2">ONG</span>
+              <span className="block text-start mb-2 text-[var(--text)]">
+                ONG
+              </span>
               <select
                 value={selectedOng}
                 onChange={(e) => setSelectedOng(e.target.value)}
-                className="w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 mb-6"
+                className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] mb-6"
               >
                 <option value="">Selecione uma ONG</option>
                 {ongs.map((ong) => (
@@ -108,7 +110,7 @@ export default function OngSelector() {
         <p className="SubTitulo">Ainda não tem uma conta?</p>
         <a
           href="/register"
-          className="text-xl text-purple-600 font-bold hover:text-purple-800 ml-2"
+          className="text-xl text-[var(--accent)] font-bold hover:opacity-80 ml-2"
         >
           Criar minha ONG
         </a>

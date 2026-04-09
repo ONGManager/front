@@ -64,16 +64,16 @@ export default function Home() {
           Subtitulo="Entre na sua conta para gerenciar sua ONG"
         />
         <form
-          className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 h-78 bg-white border border-gray-300 rounded-2xl shadow-2xl p-8"
+          className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 h-78 bg-[var(--surface)] border border-[var(--card-border)] rounded-2xl shadow-2xl p-8"
           onSubmit={handleSubmit}
         >
           <div className="w-80">
-            <span className="block text-start">E-mail</span>
+            <span className="block text-start text-[var(--text)]">E-mail</span>
             <div className="flex flex-col my-2 mb-6">
               <input
                 type="email"
                 placeholder="Digite seu e-mail"
-                className="w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 "
+                className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -81,13 +81,13 @@ export default function Home() {
             </div>
           </div>
           <div className="w-80">
-            <span className="block text-start">Senha</span>
+            <span className="block text-start text-[var(--text)]">Senha</span>
             <div className="flex flex-col my-2 mb-8">
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Digite sua senha"
-                  className="w-80 h-10 border-2 border-gray-300 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600"
+                  className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
@@ -95,7 +95,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-2 text-gray-500 hover:text-gray-700 text-sm"
+                  className="absolute right-3 top-2 text-[var(--muted)] hover:text-[var(--text)] text-sm"
                   aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? (
@@ -127,7 +127,7 @@ export default function Home() {
               </div>
               <a
                 href="/forgot-password"
-                className="text-purple-600 font-bold hover:text-purple-800 cursor-pointer block text-right"
+                className="text-[var(--accent)] font-bold hover:opacity-80 cursor-pointer block text-right"
               >
                 Esqueceu a senha?
               </a>
@@ -149,7 +149,7 @@ export default function Home() {
           <p className="SubTitulo">Ainda não tem uma conta?</p>
           <a
             href="/register"
-            className="text-xl text-purple-600 font-bold hover:text-purple-800 ml-2"
+            className="text-xl text-[var(--accent)] font-bold hover:opacity-80 ml-2"
           >
             Criar minha ONG
           </a>

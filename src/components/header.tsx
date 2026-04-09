@@ -8,6 +8,7 @@ export default function Header() {
   const [userName, setUserName] = useState("Usuário");
   const [userRole, setUserRole] = useState("colaborador");
   const [userInitials, setUserInitials] = useState("US");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     async function loadUser() {
@@ -36,15 +37,38 @@ export default function Header() {
     loadUser();
   }, []);
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia?.(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const initialTheme = prefersDark ? "dark" : "light";
+    setTheme(initialTheme);
+    document.documentElement.setAttribute("data-theme", initialTheme);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+  }
+
   return (
-    <header className="bg-white border-b border-gray-100 px-6 h-16 flex items-center justify-between w-full">
+    <header className="bg-[var(--surface)] border-b border-[var(--surface-border)] px-6 h-16 flex items-center justify-between w-full">
       {/* Esquerda */}
       <div className="flex flex-col gap-0.5">
-        <h1 className="text-[15px] font-semibold text-purple-700 tracking-tight flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-700 opacity-40" />
+        <h1 className="text-[15px] font-semibold text-[var(--accent)] tracking-tight flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-40" />
           Painel Executivo
         </h1>
-        <span className="text-xs text-gray-400 font-normal">
+        <span className="text-xs text-[var(--muted)] font-normal">
           Bem-vindo de volta, {userName}
         </span>
       </div>
@@ -52,9 +76,9 @@ export default function Header() {
       {/* Direita */}
       <div className="flex items-center gap-3">
         {/* Notificações */}
-        <button className="relative w-[34px] h-[34px] rounded-lg border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors">
+        <button className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors">
           <svg
-            className="w-4 h-4 text-gray-500"
+            className="w-4 h-4 text-[var(--icon)]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -68,19 +92,57 @@ export default function Header() {
           </svg>
         </button>
 
-        <div className="w-px h-6 bg-gray-100" />
+        {/* Tema */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label="Alternar tema"
+          className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors"
+        >
+          {theme === "dark" ? (
+            <svg
+              className="w-4 h-4 text-[var(--icon)]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 3v1.5m0 15V21m9-9h-1.5M4.5 12H3m14.95-7.95l-1.06 1.06M6.11 17.89l-1.06 1.06m12.02 0-1.06-1.06M6.11 6.11L5.05 5.05M12 7a5 5 0 100 10 5 5 0 000-10z"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="w-4 h-4 text-[var(--icon)]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"
+              />
+            </svg>
+          )}
+        </button>
+
+        <div className="w-px h-6 bg-[var(--divider)]" />
 
         {/* Perfil */}
         <div className="flex items-center gap-2">
           <div className="flex flex-col items-end">
-            <span className="text-[13px] font-medium text-gray-800">
+            <span className="text-[13px] font-medium text-[var(--text)]">
               {userName}
             </span>
-            <span className="text-[11px] text-gray-400">
+            <span className="text-[11px] text-[var(--muted)]">
               {userRole === "admin" ? "Administrador" : "Voluntário"}
             </span>
           </div>
-          <div className="w-8 h-8 rounded-full bg-purple-50 border-2 border-purple-200 flex items-center justify-center text-[11px] font-semibold text-purple-800 cursor-pointer hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] border-2 border-[var(--accent-border)] flex items-center justify-center text-[11px] font-semibold text-[var(--accent)] cursor-pointer hover:opacity-80 transition-opacity">
             {userInitials}
           </div>
         </div>

@@ -114,8 +114,12 @@ export default function MembersPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Voluntários</h1>
-          <p className="text-gray-600">Gerencie os membros da sua ONG</p>
+          <h1 className="text-2xl font-bold text-[var(--text)]">
+            Voluntários
+          </h1>
+          <p className="text-[var(--muted)]">
+            Gerencie os membros da sua ONG
+          </p>
         </div>
         <Button
           variant="contained"
@@ -126,36 +130,36 @@ export default function MembersPage() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-[var(--surface)] rounded-lg shadow border border-[var(--card-border)]">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-[var(--table-head)] border-b border-[var(--surface-border)]">
             <tr>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="text-left px-6 py-3 text-sm font-medium text-[var(--muted)]">
                 Nome
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="text-left px-6 py-3 text-sm font-medium text-[var(--muted)]">
                 Email
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="text-left px-6 py-3 text-sm font-medium text-[var(--muted)]">
                 Função
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--surface-border)]">
             {members.map((member) => (
-              <tr key={member.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-800">
+              <tr key={member.id} className="hover:bg-[var(--surface-hover)]">
+                <td className="px-6 py-4 text-sm text-[var(--text)]">
                   {member.user.name}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
+                <td className="px-6 py-4 text-sm text-[var(--muted)]">
                   {member.user.email}
                 </td>
                 <td className="px-6 py-4">
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
                       member.role === "admin"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-gray-100 text-gray-600"
+                        ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                        : "bg-[var(--surface-hover)] text-[var(--muted)]"
                     }`}
                   >
                     {member.role === "admin" ? "Administrador" : "Voluntário"}
@@ -167,7 +171,7 @@ export default function MembersPage() {
         </table>
 
         {members.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-[var(--muted)]">
             Nenhum membro cadastrado
           </div>
         )}

@@ -8,13 +8,15 @@ export default function ForgotPassword() {
         Titulo="Esqueceu sua senha?"
         Subtitulo="Sem problemas. Informe o e-mail cadastrado e enviaremos as instruções para redefinir sua senha."
       />
-      <div className="flex flex-col items-center justify-center mt-8 mb-4 mx-auto w-98 h-50 bg-white border border-gray-300 rounded-2xl shadow-2xl p-6">
-        <span className="block text-start self-start ml-7">E-mail</span>
+      <div className="flex flex-col items-center justify-center mt-8 mb-4 mx-auto w-98 h-50 bg-[var(--surface)] border border-[var(--card-border)] rounded-2xl shadow-2xl p-6">
+        <span className="block text-start self-start ml-7 text-[var(--text)]">
+          E-mail
+        </span>
         <form className="flex flex-col my-2 mb-6 ">
           <input
             type="email"
             placeholder="Digite seu e-mail"
-            className="w-80 h-10 border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent hover:border-purple-600 "
+            className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
           />
         </form>
         <Button
@@ -29,7 +31,7 @@ export default function ForgotPassword() {
         <p className="SubTitulo">Lembrou sua senha?</p>
         <a
           href="/."
-          className="text-xl text-purple-600 font-bold hover:text-purple-800 ml-2"
+          className="text-xl text-[var(--accent)] font-bold hover:opacity-80 ml-2"
         >
           Entrar na conta
         </a>

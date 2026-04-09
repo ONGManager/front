@@ -54,7 +54,7 @@ export default function PrivateLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] text-[var(--text)]">
         <p>Carregando...</p>
       </div>
     );
@@ -67,7 +67,7 @@ export default function PrivateLayout({
 
   // Com ONG selecionada, mostra com sidebar
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-[var(--bg)]">
       <Sidebar userRole={userRole} />
       <div className="flex-1 min-w-0">
         <Header />
