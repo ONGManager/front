@@ -365,25 +365,27 @@ export default function KanbanPage() {
                       )}
                     </div>
                     {isAdmin && (
-                      <div className="flex justify-end gap-1 mt-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditModal(task);
-                          }}
-                          className="text-blue-600 hover:text-blue-800 text-sm border-2 p-2 border-blue-600 hover:bg-blue-200 rounded-xl bg-blue-200"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(task.id);
-                          }}
-                          className="text-red-600 hover:text-red-800 text-sm ml-2 border-2 p-2 border-red-600 hover:bg-red-200 rounded-xl bg-red-200"
-                        >
-                          Excluir
-                        </button>
+                      <div className="">
+                        <div className="flex justify-end gap-2 mt-4">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(task);
+                            }}
+                            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-blue-700 bg-blue-600"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(task.id);
+                            }}
+                            className="text-white text-sm font-medium px-4 py-2 rounded-sm hover:bg-red-700 bg-red-600"
+                          >
+                            Excluir
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -397,20 +399,45 @@ export default function KanbanPage() {
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: "var(--surface)",
+            color: "var(--text)",
+            borderRadius: 2,
+            border: "1px solid var(--surface-border)",
+            minHeight: 400,
+          },
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: "var(--text)" }}>
           {editingTask ? "Editar Tarefa" : "Nova Tarefa"}
         </DialogTitle>
-        <DialogContent>
-          <div className="space-y-4 mt-2">
+        <DialogContent sx={{ pt: 1 }}>
+          <div className="mt-2">
+            <div className="flex flex-col gap-5">
             <TextField
               label="Título"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               fullWidth
               required
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "var(--text)",
+                },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  minHeight: 48,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
             <TextField
               label="Descrição"
@@ -419,13 +446,42 @@ export default function KanbanPage() {
               fullWidth
               multiline
               rows={3}
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "var(--text)",
+                },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
-            <FormControl fullWidth>
-              <InputLabel>Prioridade</InputLabel>
+            <FormControl fullWidth sx={{ minHeight: 48 }}>
+              <InputLabel sx={{ color: "var(--muted)" }}>Prioridade</InputLabel>
               <Select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 label="Prioridade"
+                sx={{
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  minHeight: 48,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-border)",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-hover)",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-ring)",
+                  },
+                }}
               >
                 <MenuItem value="baixa">Baixa</MenuItem>
                 <MenuItem value="media">Média</MenuItem>
@@ -440,15 +496,45 @@ export default function KanbanPage() {
               onChange={(e) => setDeadline(e.target.value)}
               fullWidth
               InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "var(--text)",
+                },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  minHeight: 78,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
-            <FormControl fullWidth>
-              <InputLabel>Atribuir para</InputLabel>
+            <FormControl fullWidth sx={{ minHeight: 48 }}>
+              <InputLabel sx={{ color: "var(--muted)" }}>Atribuir para</InputLabel>
               <Select
                 value={assignedToId}
                 onChange={(e) => setAssignedToId(e.target.value)}
                 label="Atribuir para"
+                sx={{
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  minHeight: 48,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-border)",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-hover)",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--input-ring)",
+                  },
+                }}
               >
-                <MenuItem value="">Ninguém</MenuItem>
+                <MenuItem value="">Ninguêm</MenuItem>
                 {members.map((m) => (
                   <MenuItem key={m.user.id} value={m.user.id}>
                     {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"}
@@ -457,14 +543,19 @@ export default function KanbanPage() {
                 ))}
               </Select>
             </FormControl>
+            </div>
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)}>Cancelar</Button>
-          <Button
+          <Button 
+          onClick={() => setModalOpen(false)
+          }
+          className="text-white text-sm font-medium px-4 rounded-sm hover:bg-red-700 bg-red-600"
+          >Cancelar</Button>
+          <Button 
             onClick={handleSubmit}
             variant="contained"
-            className="bg-purple-600! hover:bg-purple-700!"
+            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-red-700 bg-red-600"
           >
             {editingTask ? "Salvar" : "Criar"}
           </Button>
@@ -474,11 +565,19 @@ export default function KanbanPage() {
       <Dialog
         open={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: "var(--surface)",
+            color: "var(--text)",
+            borderRadius: 2,
+            border: "1px solid var(--surface-border)",
+          },
+        }}
       >
-        <DialogTitle>Detalhes da Tarefa</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ color: "var(--text)" }}>Detalhes da Tarefa</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
           {detailsLoading ? (
             <p>Carregando detalhes...</p>
           ) : selectedTaskDetails ? (

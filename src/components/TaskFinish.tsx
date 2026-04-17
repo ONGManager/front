@@ -1,44 +1,31 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
 import { getKanbanTasksApi } from "@/src/services/kanbanService";
+import { useEffect, useState } from "react";
 
 export default function TaskFinish() {
-  const [count, setCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+    const [count, setCount] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [ongId, setOngId] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadCount() {
-      try {
-        const ongId = localStorage.getItem("selectedOngId");
-        if (!ongId) {
-          setError("ONG não selecionada");
-          return;
-        }
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const tasks = await getKanbanTasksApi(ongId as string);
+                const total = Array.isArray(tasks) ? tasks.filter((t) => t.status === "concluido").length: 0;
+                setCount(total);
+            } catch (err) {
+                setError("Erro ao buscar tarefas");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        const tasks = await getKanbanTasksApi(ongId);
-        const total = Array.isArray(tasks)
-          ? tasks.filter((t) => t.status === "concluido").length
-          : 0;
-        setCount(total);
-      } catch (err) {
-        setError("Erro ao carregar quantidade de tarefas concluídas");
-      } finally {
-        setLoading(false);
-      }
-    }
+        fetchTasks();
+    }, [ongId]);
 
-    loadCount();
-  }, []);
-
-  if (loading) {
-    return <span>Carregando...</span>;
-  }
-
-  if (error) {
-    return <span>{error}</span>;
-  }
-
-  return <span>{count}</span>;
+    return(
+        <p>{ongId}</p>
+    )
 }
