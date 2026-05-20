@@ -9,7 +9,7 @@ interface SidebarProps {
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", adminOnly: false },
-  { href: "/kanban", label: "Tarefas", adminOnly: false },
+  { href: "/kanban", label: "Tarefas", adminOnly: false },  
   { href: "/members", label: "Voluntários", adminOnly: true },
 ];
 
@@ -94,6 +94,13 @@ export default function Sidebar({ userRole = "colaborador" }: SidebarProps) {
         >
           Sair
         </button>
+
+        <Link
+          href="/profile"
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors"
+        >
+          Perfil
+        </Link>
       </div>
     </aside>
   );
