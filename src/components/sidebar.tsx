@@ -10,6 +10,7 @@ interface SidebarProps {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", adminOnly: false },
   { href: "/kanban", label: "Tarefas", adminOnly: false },  
+  { href: "/bill", label: "Contas a Pagar", adminOnly: false },
   { href: "/members", label: "Voluntários", adminOnly: true },
 ];
 
