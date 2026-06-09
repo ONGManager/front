@@ -286,31 +286,31 @@ export default function Bill() {
       </p>
 
       {/* Cards de Resumo */}
-      <div className="flex flex-row justify-between my-2 gap-4">
-        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-4 mt-4 w-80 h-30 text-center">
-          <span className="uppercase text-sm font-extralight text-[var(--muted)]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-6 text-center shadow-sm">
+          <span className="uppercase text-xs font-semibold tracking-wider text-[var(--muted)] block mb-2">
             Total de receitas
           </span>
-          <p className="text-3xl font-bold">
+          <p className="text-3xl font-bold text-green-600">
             {summary ? formatCurrency(summary.totalReceitas) : "R$ 0,00"}
           </p>
-          <p className="text-green-500 mt-2">
+          <p className="text-xs text-[var(--muted)] mt-2">
             {summary?.receitaCount || 0} lançamentos confirmados
           </p>
         </div>
-        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-4 mt-4 w-80 h-30 text-center">
-          <span className="uppercase text-sm font-extralight text-[var(--muted)]">
+        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-6 text-center shadow-sm">
+          <span className="uppercase text-xs font-semibold tracking-wider text-[var(--muted)] block mb-2">
             Total de despesas
           </span>
-          <p className="text-3xl font-bold">
+          <p className="text-3xl font-bold text-red-600">
             {summary ? formatCurrency(summary.totalDespesas) : "R$ 0,00"}
           </p>
-          <p className="text-red-500 mt-2">
+          <p className="text-xs text-[var(--muted)] mt-2">
             {summary?.despesaCount || 0} lançamentos confirmados
           </p>
         </div>
-        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-4 mt-4 w-80 h-30 text-center">
-          <span className="uppercase text-sm font-extralight text-[var(--muted)]">
+        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-3xl p-6 text-center shadow-sm sm:col-span-2 lg:col-span-1">
+          <span className="uppercase text-xs font-semibold tracking-wider text-[var(--muted)] block mb-2">
             Saldo
           </span>
           <p
@@ -318,41 +318,43 @@ export default function Bill() {
           >
             {summary ? formatCurrency(summary.balance) : "R$ 0,00"}
           </p>
-          <p className="text-[var(--muted)] mt-2">Receitas menos despesas</p>
+          <p className="text-xs text-[var(--muted)] mt-2">Receitas menos despesas</p>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="mt-6 flex gap-4 items-center">
-        <div>
-          <label className="text-sm text-[var(--muted)]">Tipo:</label>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
-            className="ml-2 px-3 py-1 bg-[var(--card)] border border-[var(--surface-border)] rounded text-[var(--text)]"
-          >
-            <option value="all">Todos</option>
-            <option value="receita">Receita</option>
-            <option value="despesa">Despesa</option>
-          </select>
+      <div className="mt-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex items-center">
+            <label className="text-sm text-[var(--muted)] font-medium">Tipo:</label>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as any)}
+              className="ml-2 px-3 py-1.5 bg-[var(--card)] border border-[var(--surface-border)] rounded text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] cursor-pointer"
+            >
+              <option value="all">Todos</option>
+              <option value="receita">Receita</option>
+              <option value="despesa">Despesa</option>
+            </select>
+          </div>
+          <div className="flex items-center">
+            <label className="text-sm text-[var(--muted)] font-medium">Status:</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="ml-2 px-3 py-1.5 bg-[var(--card)] border border-[var(--surface-border)] rounded text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] cursor-pointer"
+            >
+              <option value="all">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="confirmado">Confirmado</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="text-sm text-[var(--muted)]">Status:</label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="ml-2 px-3 py-1 bg-[var(--card)] border border-[var(--surface-border)] rounded text-[var(--text)]"
-          >
-            <option value="all">Todos</option>
-            <option value="pendente">Pendente</option>
-            <option value="confirmado">Confirmado</option>
-          </select>
-        </div>
-        <div className="ml-auto">
+        <div className="flex justify-end">
           <Button
             variant="contained"
             onClick={openCreateModal}
-            className="bg-purple-600! hover:bg-purple-700!"
+            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer w-full md:w-auto"
           >
             Adicionar Conta
           </Button>

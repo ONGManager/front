@@ -143,26 +143,28 @@ export default function Dashboard() {
         </div>
       </div>
       <div>
-        <div className="flex flex-row gap-2">
-          <div className="bg-[var(--surface)] rounded-lg shadow p-6 my-6 w-1/3">
-            <div className="flex items-center">
-              <p className="text-[var(--force-text)] text-3xl font-semibold">Voluntários</p>
-              <div className="ml-auto text-2xl">
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <div className="bg-[var(--surface)] rounded-lg shadow p-6 flex-1 border border-[var(--card-border)]">
+            <div className="flex items-center justify-between">
+              <p className="text-[var(--text)] text-lg font-medium">Voluntários</p>
+              <div className="text-3xl font-bold text-[var(--accent)]">
                 <QntdFunc />  
               </div>
             </div>
           </div>
-          <div className="bg-[var(--surface)] rounded-lg shadow p-6 my-6 w-1/3">
-            <div className="flex items-center">
-              <p className="text-[var(--force-text)] text-3xl font-semibold">Tarefas Concluídas</p>
-              <div className="ml-auto text-2xl">
+          <div className="bg-[var(--surface)] rounded-lg shadow p-6 flex-1 border border-[var(--card-border)]">
+            <div className="flex items-center justify-between">
+              <p className="text-[var(--text)] text-lg font-medium">Tarefas Concluídas</p>
+              <div className="text-3xl font-bold text-[var(--accent)]">
                 <TaskFinish />
               </div>
             </div>
           </div>
         </div>
-        <div>
-          <Grafico1 />  
+        <div className="bg-[var(--surface)] rounded-lg shadow p-6 mt-6 border border-[var(--card-border)] overflow-x-auto">
+          <div className="min-w-[500px] md:min-w-0">
+            <Grafico1 />  
+          </div>
         </div>
       </div>
     </div>

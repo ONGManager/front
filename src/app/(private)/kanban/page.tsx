@@ -75,6 +75,9 @@ export default function KanbanPage() {
     useState<KanbanTaskDetails | null>(null);
   const [editingTask, setEditingTask] = useState<KanbanTask | null>(null);
   const [draggedTask, setDraggedTask] = useState<KanbanTask | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -189,15 +192,25 @@ export default function KanbanPage() {
     }
   };
 
-  const handleDelete = async (taskId: string) => {
-    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+  const openDeleteDialog = (task: KanbanTask) => {
+    setTaskToDelete(task);
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDelete = async () => {
+    if (!taskToDelete) return;
+
+    setDeleting(true);
     try {
-      await deleteKanbanTaskApi(ongId, taskId);
-      setTasks(tasks.filter((t) => t.id !== taskId));
+      await deleteKanbanTaskApi(ongId, taskToDelete.id);
+      setTasks(tasks.filter((t) => t.id !== taskToDelete.id));
       toast.success("Tarefa excluída!");
+      setDeleteDialogOpen(false);
+      setTaskToDelete(null);
     } catch (err) {
       toast.error("Erro ao excluir tarefa");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -301,11 +314,11 @@ export default function KanbanPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="flex flex-row overflow-x-auto gap-4 pb-4 md:grid md:grid-cols-4 md:overflow-x-visible md:pb-0">
         {columns.map(({ key, color }) => (
           <div
             key={key}
-            className={`bg-[var(--surface)] rounded-lg shadow p-4 border-t-4 ${color}`}
+            className={`bg-[var(--surface)] rounded-lg shadow p-4 border-t-4 ${color} w-[280px] shrink-0 md:w-auto md:shrink-1`}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(key)}
           >
@@ -331,29 +344,29 @@ export default function KanbanPage() {
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-[var(--text)]">
+                      <h3 className="font-medium text-[var(--text)] text-sm line-clamp-2">
                         {task.title}
                       </h3>
                       <span
-                        className={`text-xs px-2 py-1 rounded ${priorityColors[task.priority]}`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${priorityColors[task.priority]}`}
                       >
                         {priorityLabels[task.priority]}
                       </span>
                     </div>
                     {task.description && (
-                      <p className="text-sm text-[var(--muted)] mb-2 line-clamp-2">
+                      <p className="text-xs text-[var(--muted)] mb-2 line-clamp-2">
                         {task.description}
                       </p>
                     )}
-                    <div className="flex justify-between items-center text-xs text-[var(--muted)]">
+                    <div className="flex justify-between items-center text-[10px] text-[var(--muted)]">
                       <div>
                         {task.assignedTo && (
-                          <span className="bg-[var(--accent-soft)] text-[var(--accent)] px-2 py-1 rounded">
+                          <span className="bg-[var(--accent-soft)] text-[var(--accent)] px-1.5 py-0.5 rounded">
                             {task.assignedTo.name}
                           </span>
                         )}
                         {isTaskOverdue(task) && (
-                          <span className="ml-2 bg-[var(--danger-soft)] text-[var(--danger)] px-2 py-1 rounded font-semibold">
+                          <span className="ml-1.5 bg-[var(--danger-soft)] text-[var(--danger)] px-1.5 py-0.5 rounded font-semibold">
                             Atrasada
                           </span>
                         )}
@@ -365,27 +378,25 @@ export default function KanbanPage() {
                       )}
                     </div>
                     {isAdmin && (
-                      <div className="">
-                        <div className="flex justify-end gap-2 mt-4">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(task);
-                            }}
-                            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-blue-700 bg-blue-600"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(task.id);
-                            }}
-                            className="text-white text-sm font-medium px-4 py-2 rounded-sm hover:bg-red-700 bg-red-600"
-                          >
-                            Excluir
-                          </button>
-                        </div>
+                      <div className="mt-4 border-t border-[var(--surface-border)] pt-3 flex justify-end gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(task);
+                          }}
+                          className="text-white text-xs font-semibold px-2.5 py-1 rounded hover:bg-blue-700 bg-blue-600 cursor-pointer"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(task);
+                          }}
+                          className="text-white text-xs font-semibold px-2.5 py-1 rounded hover:bg-red-700 bg-red-600 cursor-pointer"
+                        >
+                          Excluir
+                        </button>
                       </div>
                     )}
                   </div>
@@ -661,6 +672,47 @@ export default function KanbanPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDetailsModalOpen(false)}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de Excluir Tarefa */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => !deleting && setDeleteDialogOpen(false)}
+        disableEscapeKeyDown={deleting}
+        PaperProps={{
+          sx: {
+            bgcolor: "var(--surface)",
+            color: "var(--text)",
+            borderRadius: 2,
+            border: "1px solid var(--surface-border)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: "var(--text)" }}>Excluir tarefa</DialogTitle>
+        <DialogContent>
+          <p className="text-[var(--text)]">
+            Tem certeza que deseja excluir essa tarefa? Essa ação não pode ser desfeita.
+          </p>
+          {taskToDelete ? (
+            <p className="mt-3 text-sm text-[var(--muted)] font-semibold">
+              {taskToDelete.title}
+            </p>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting} className="text-purple-600!">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+            className="bg-red-600! hover:bg-red-700! text-white cursor-pointer"
+          >
+            {deleting ? "Excluindo..." : "Excluir"}
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

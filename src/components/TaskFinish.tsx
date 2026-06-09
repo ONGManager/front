@@ -7,13 +7,19 @@ export default function TaskFinish() {
     const [count, setCount] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [ongId, setOngId] = useState<string | null>(null);
 
     useEffect(() => {
+        const storedOngId = localStorage.getItem("selectedOngId");
+        if (!storedOngId) {
+            setError("ONG não selecionada");
+            setLoading(false);
+            return;
+        }
+
         const fetchTasks = async () => {
             try {
-                const tasks = await getKanbanTasksApi(ongId as string);
-                const total = Array.isArray(tasks) ? tasks.filter((t) => t.status === "concluido").length: 0;
+                const tasks = await getKanbanTasksApi(storedOngId);
+                const total = Array.isArray(tasks) ? tasks.filter((t) => t.status === "concluido").length : 0;
                 setCount(total);
             } catch (err) {
                 setError("Erro ao buscar tarefas");
@@ -23,9 +29,17 @@ export default function TaskFinish() {
         };
 
         fetchTasks();
-    }, [ongId]);
+    }, []);
 
-    return(
-        <p>{ongId}</p>
-    )
+    if (loading) {
+        return <p>...</p>;
+    }
+
+    if (error) {
+        return <p>-</p>;
+    }
+
+    return (
+        <p>{count !== null ? count : 0}</p>
+    );
 }

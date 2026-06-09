@@ -130,8 +130,8 @@ export default function MembersPage() {
         </Button>
       </div>
 
-      <div className="bg-[var(--surface)] rounded-lg shadow border border-[var(--card-border)]">
-        <table className="w-full">
+      <div className="bg-[var(--surface)] rounded-lg shadow border border-[var(--card-border)] overflow-x-auto">
+        <table className="w-full min-w-[600px]">
           <thead className="bg-[var(--table-head)] border-b border-[var(--surface-border)]">
             <tr>
               <th className="text-left px-6 py-3 text-sm font-medium text-[var(--muted)]">
@@ -183,9 +183,17 @@ export default function MembersPage() {
         onClose={() => setModalOpen(false)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: "var(--surface)",
+            color: "var(--text)",
+            borderRadius: 2,
+            border: "1px solid var(--surface-border)",
+          },
+        }}
       >
-        <DialogTitle>Cadastrar Voluntário</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ color: "var(--text)" }}>Cadastrar Voluntário</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
           <div className="space-y-4 mt-2">
             <TextField
               label="Nome"
@@ -193,6 +201,18 @@ export default function MembersPage() {
               onChange={(e) => setName(e.target.value)}
               fullWidth
               required
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
             <TextField
               label="Email"
@@ -201,6 +221,18 @@ export default function MembersPage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               required
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
             <TextField
               label="Senha"
@@ -210,17 +242,30 @@ export default function MembersPage() {
               fullWidth
               required
               helperText="Mínimo 6 caracteres"
+              FormHelperTextProps={{ sx: { color: "var(--muted)" } }}
+              sx={{
+                "& .MuiInputLabel-root": { color: "var(--muted)" },
+                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+                "& .MuiOutlinedInput-root": {
+                  color: "var(--text)",
+                  bgcolor: "var(--input)",
+                  borderRadius: 1,
+                  "& fieldset": { borderColor: "var(--input-border)" },
+                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                },
+              }}
             />
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)} disabled={submitting}>
+          <Button onClick={() => setModalOpen(false)} disabled={submitting} className="text-purple-600!">
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            className="bg-purple-600! hover:bg-purple-700!"
+            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer"
             disabled={submitting}
           >
             {submitting ? "Cadastrando..." : "Cadastrar"}

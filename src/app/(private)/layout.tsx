@@ -17,6 +17,7 @@ export default function PrivateLayout({
   const [userRole, setUserRole] = useState<string>("colaborador");
   const [loading, setLoading] = useState(true);
   const [hasOngSelected, setHasOngSelected] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Páginas que não precisam de ONG selecionada
   const noOngRequiredPaths = ["/OngSelector"];
@@ -67,11 +68,11 @@ export default function PrivateLayout({
 
   // Com ONG selecionada, mostra com sidebar
   return (
-    <div className="min-h-screen flex bg-[var(--bg)]">
-      <Sidebar userRole={userRole} />
-      <div className="flex-1 min-w-0">
-        <Header />
-        <main className="p-6">{children}</main>
+    <div className="min-h-screen flex bg-[var(--bg)] overflow-x-hidden">
+      <Sidebar userRole={userRole} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 min-w-0 flex flex-col">
+        <Header onOpenSidebar={() => setIsSidebarOpen(true)} />
+        <main className="p-4 md:p-6 flex-1">{children}</main>
       </div>
     </div>
   );

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { getMeApi } from "../services/authService";
 import { getOngApi } from "../services/ongService";
 
-export default function Header() {
+interface HeaderProps {
+  onOpenSidebar?: () => void;
+}
+
+export default function Header({ onOpenSidebar }: HeaderProps) {
   const [userName, setUserName] = useState("Usuário");
   const [userRole, setUserRole] = useState("colaborador");
   const [userInitials, setUserInitials] = useState("US");
@@ -61,22 +65,46 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-[var(--surface)] border-b border-[var(--surface-border)] px-6 h-16 flex items-center justify-between w-full">
+    <header className="bg-[var(--surface)] border-b border-[var(--surface-border)] px-4 md:px-6 h-16 flex items-center justify-between w-full shrink-0">
       {/* Esquerda */}
-      <div className="flex flex-col gap-0.5">
-        <h1 className="text-[15px] font-semibold text-[var(--accent)] tracking-tight flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-40" />
-          Painel Executivo
-        </h1>
-        <span className="text-xs text-[var(--muted)] font-normal">
-          Bem-vindo de volta, {userName}
-        </span>
+      <div className="flex items-center gap-3">
+        {onOpenSidebar && (
+          <button
+            type="button"
+            onClick={onOpenSidebar}
+            className="md:hidden w-8 h-8 rounded-lg border border-[var(--surface-border)] flex items-center justify-center text-[var(--icon)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            aria-label="Abrir menu"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        )}
+        <div className="flex flex-col gap-0.5">
+          <h1 className="text-[14px] md:text-[15px] font-semibold text-[var(--accent)] tracking-tight flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-40" />
+            Painel Executivo
+          </h1>
+          <span className="text-[10px] md:text-xs text-[var(--muted)] font-normal truncate max-w-[150px] md:max-w-none">
+            Bem-vindo, {userName}
+          </span>
+        </div>
       </div>
 
       {/* Direita */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Notificações */}
-        <button className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors">
+        <button className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors cursor-pointer">
           <svg
             className="w-4 h-4 text-[var(--icon)]"
             fill="none"
@@ -97,7 +125,7 @@ export default function Header() {
           type="button"
           onClick={toggleTheme}
           aria-label="Alternar tema"
-          className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors"
+          className="relative w-[34px] h-[34px] rounded-lg border border-[var(--surface-border)] flex items-center justify-center hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
         >
           {theme === "dark" ? (
             <svg
@@ -134,8 +162,8 @@ export default function Header() {
 
         {/* Perfil */}
         <div className="flex items-center gap-2">
-          <div className="flex flex-col items-end">
-            <span className="text-[13px] font-medium text-[var(--text)]">
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-[13px] font-medium text-[var(--text)] max-w-[120px] truncate">
               {userName}
             </span>
             <span className="text-[11px] text-[var(--muted)]">

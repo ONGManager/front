@@ -57,37 +57,37 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen align-middle flex flex-col justify-center items-center">
-      <div className="flex flex-col items-center justify-center">
+    <main className="min-h-screen align-middle flex flex-col justify-center items-center px-4 py-8">
+      <div className="flex flex-col items-center justify-center w-full max-w-[400px]">
         <LoginPadrao
           Titulo="Bem-vindo de volta!"
           Subtitulo="Entre na sua conta para gerenciar sua ONG"
         />
         <form
-          className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-98 h-78 bg-[var(--surface)] border border-[var(--card-border)] rounded-2xl shadow-2xl p-8"
+          className="flex flex-col items-center justify-center mt-4 mb-4 mx-auto w-full h-auto bg-[var(--surface)] border border-[var(--card-border)] rounded-2xl shadow-2xl p-6 md:p-8"
           onSubmit={handleSubmit}
         >
-          <div className="w-80">
+          <div className="w-full">
             <span className="block text-start text-[var(--text)]">E-mail</span>
             <div className="flex flex-col my-2 mb-6">
               <input
                 type="email"
                 placeholder="Digite seu e-mail"
-                className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
+                className="w-full h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
               />
             </div>
           </div>
-          <div className="w-80">
+          <div className="w-full">
             <span className="block text-start text-[var(--text)]">Senha</span>
             <div className="flex flex-col my-2 mb-8">
-              <div className="relative">
+              <div className="relative w-full">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Digite sua senha"
-                  className="w-80 h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
+                  className="w-full h-10 bg-[var(--input)] border-2 border-[var(--input-border)] text-[var(--text)] rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)]"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
@@ -95,7 +95,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-2 text-[var(--muted)] hover:text-[var(--text)] text-sm"
+                  className="absolute right-3 top-2 text-[var(--muted)] hover:text-[var(--text)] text-sm cursor-pointer"
                   aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? (
@@ -127,29 +127,29 @@ export default function Home() {
               </div>
               <a
                 href="/forgot-password"
-                className="text-[var(--accent)] font-bold hover:opacity-80 cursor-pointer block text-right"
+                className="text-[var(--accent)] font-bold hover:opacity-80 cursor-pointer block text-right mt-2 text-sm"
               >
                 Esqueceu a senha?
               </a>
             </div>
           </div>
-          <div className="">
+          <div className="w-full">
             <Button
               variant="contained"
               color="primary"
               type="submit"
-              className="w-80 h-10 bg-purple-600! hover:bg-purple-700! text-white"
+              className="w-full h-10 bg-purple-600! hover:bg-purple-700! text-white cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </div>
         </form>
-        <div className="flex">
-          <p className="SubTitulo">Ainda não tem uma conta?</p>
+        <div className="flex flex-wrap items-center justify-center gap-1 mt-2">
+          <p className="SubTitulo mb-0!">Ainda não tem uma conta?</p>
           <a
             href="/register"
-            className="text-xl text-[var(--accent)] font-bold hover:opacity-80 ml-2"
+            className="text-base md:text-xl text-[var(--accent)] font-bold hover:opacity-80"
           >
             Criar minha ONG
           </a>

@@ -21,6 +21,7 @@
   --danger: #dc2626;
   --danger-soft: #fee2e2;
   --force-text: #000000;
+  --card: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -50,12 +51,12 @@
 
 /* Classes customizadas com Tailwind utilities */
 .Titulo {
-    @apply text-6xl font-bold text-center mb-6;
+    @apply text-4xl md:text-6xl font-bold text-center mb-4 md:mb-6;
     color: var(--accent);
 }
 
 .SubTitulo {
-  @apply text-xl mb-4 text-center;
+  @apply text-base md:text-xl mb-4 text-center;
   color: var(--muted);
 }
 
