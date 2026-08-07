@@ -163,7 +163,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-[var(--surface)] rounded-lg shadow p-6 mt-6 border border-[var(--card-border)] overflow-x-auto">
           <div className="min-w-[500px] md:min-w-0">
-            <Grafico1 />  
+            <Grafico1 ongId={ong?.id ?? ""} />
           </div>
         </div>
       </div>

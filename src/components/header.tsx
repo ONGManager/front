@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getMeApi } from "../services/authService";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getMeApi, logoutApi } from "../services/authService";
 import { getOngApi } from "../services/ongService";
 
 interface HeaderProps {
@@ -9,10 +10,14 @@ interface HeaderProps {
 }
 
 export default function Header({ onOpenSidebar }: HeaderProps) {
+  const router = useRouter();
   const [userName, setUserName] = useState("Usuário");
   const [userRole, setUserRole] = useState("colaborador");
   const [userInitials, setUserInitials] = useState("US");
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     async function loadUser() {
@@ -57,12 +62,36 @@ export default function Header({ onOpenSidebar }: HeaderProps) {
     document.documentElement.setAttribute("data-theme", initialTheme);
   }, []);
 
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowProfileMenu(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     localStorage.setItem("theme", nextTheme);
     document.documentElement.setAttribute("data-theme", nextTheme);
   }
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch (error) {
+      console.error("Erro ao sair", error);
+    }
+    localStorage.removeItem("selectedOngId");
+    router.push("/");
+  };
 
   return (
     <header className="bg-[var(--surface)] border-b border-[var(--surface-border)] px-4 md:px-6 h-16 flex items-center justify-between w-full shrink-0">
@@ -170,8 +199,46 @@ export default function Header({ onOpenSidebar }: HeaderProps) {
               {userRole === "admin" ? "Administrador" : "Voluntário"}
             </span>
           </div>
-          <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] border-2 border-[var(--accent-border)] flex items-center justify-center text-[11px] font-semibold text-[var(--accent)] cursor-pointer hover:opacity-80 transition-opacity">
-            {userInitials}
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              type="button"
+              onClick={() => setShowProfileMenu((current) => !current)}
+              className="w-8 h-8 rounded-full bg-[var(--accent-soft)] border-2 border-[var(--accent-border)] flex items-center justify-center text-[11px] font-semibold text-[var(--accent)] cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-label="Abrir menu do perfil"
+            >
+              {userInitials}
+            </button>
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 min-w-[180px] bg-[var(--surface)] border border-[var(--surface-border)] rounded-2xl shadow-xl overflow-hidden z-50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    router.push("/profile");
+                  }}
+                  className="w-full text-left px-4 py-3 text-[var(--text)] hover:bg-[var(--surface-hover)]"
+                >
+                  Perfil
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    router.push("/OngSelector");
+                  }}
+                  className="w-full text-left px-4 py-3 text-[var(--text)] hover:bg-[var(--surface-hover)]"
+                >
+                  Trocar ONG
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-3 text-[var(--danger)] hover:bg-[var(--danger-soft)]"
+                >
+                  Sair
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -2,21 +2,21 @@
 
 :root {
   --bg: #f3f4f6;
-  --surface: #ffffff;
-  --surface-border: #f3f4f6;
+  --surface: #dedbdb;
+  --surface-border: #dedbdb;
   --surface-hover: #f9fafb;
   --divider: #f3f4f6;
   --text: #111827;
-  --muted: #6b7280;
+  --muted: #17191d;
   --icon: #6b7280;
   --accent: #7c3aed;
-  --accent-soft: #ede9fe;
+  --accent-soft: #c7bff1;
   --accent-border: #c4b5fd;
   --input: #ffffff;
   --input-border: #d1d5db;
   --input-hover: #c4b5fd;
   --input-ring: #7c3aed;
-  --table-head: #f9fafb;
+  --table-head: #b0b0b0;
   --card-border: #e5e7eb;
   --danger: #dc2626;
   --danger-soft: #fee2e2;

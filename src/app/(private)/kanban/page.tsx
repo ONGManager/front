@@ -422,7 +422,7 @@ export default function KanbanPage() {
           },
         }}
       >
-        <DialogTitle sx={{ color: "var(--text)" }}>
+        <DialogTitle sx={{ color: "var(--text)"}}>
           {editingTask ? "Editar Tarefa" : "Nova Tarefa"}
         </DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
@@ -473,7 +473,7 @@ export default function KanbanPage() {
               }}
             />
             <FormControl fullWidth sx={{ minHeight: 48 }}>
-              <InputLabel sx={{ color: "var(--muted)" }}>Prioridade</InputLabel>
+              {/* <InputLabel sx={{ color: "var(--muted)" }}>Prioridade</InputLabel> */}
               <Select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
@@ -561,12 +561,12 @@ export default function KanbanPage() {
           <Button 
           onClick={() => setModalOpen(false)
           }
-          className="text-white text-sm font-medium px-4 rounded-sm hover:bg-red-700 bg-red-600"
+          className="!text-white text-sm font-medium px-4 rounded-sm !hover:bg-red-700 bg-red-600! hover:bg-red-700!"
           >Cancelar</Button>
           <Button 
             onClick={handleSubmit}
             variant="contained"
-            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-red-700 bg-red-600"
+            className="text-white text-sm font-medium px-4 rounded-sm bg-green-600! hover:bg-green-700!"
           >
             {editingTask ? "Salvar" : "Criar"}
           </Button>

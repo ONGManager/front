@@ -133,7 +133,7 @@ export default function MembersPage() {
       <div className="bg-[var(--surface)] rounded-lg shadow border border-[var(--card-border)] overflow-x-auto">
         <table className="w-full min-w-[600px]">
           <thead className="bg-[var(--table-head)] border-b border-[var(--surface-border)]">
-            <tr>
+            <tr className="">
               <th className="text-left px-6 py-3 text-sm font-medium text-[var(--muted)]">
                 Nome
               </th>
@@ -147,7 +147,7 @@ export default function MembersPage() {
           </thead>
           <tbody className="divide-y divide-[var(--surface-border)]">
             {members.map((member) => (
-              <tr key={member.id} className="hover:bg-[var(--surface-hover)]">
+              <tr key={member.id} className="bg-[var(--surface-hover)] hover:bg-[var(--surface)] ">
                 <td className="px-6 py-4 text-sm text-[var(--text)]">
                   {member.user.name}
                 </td>
@@ -258,14 +258,18 @@ export default function MembersPage() {
             />
           </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalOpen(false)} disabled={submitting} className="text-purple-600!">
+        <DialogActions className="gap-2 px-4 pb-4">
+          <Button
+            onClick={() => setModalOpen(false)}
+            disabled={submitting}
+            className="bg-[var(--surface-hover)] text-[var(--text)] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer"
+            className="!bg-[var(--accent)] !hover:bg-[var(--input-ring)] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={submitting}
           >
             {submitting ? "Cadastrando..." : "Cadastrar"}

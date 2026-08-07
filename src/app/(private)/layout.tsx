@@ -70,7 +70,7 @@ export default function PrivateLayout({
   return (
     <div className="min-h-screen flex bg-[var(--bg)] overflow-x-hidden">
       <Sidebar userRole={userRole} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col md:pl-[220px]">
         <Header onOpenSidebar={() => setIsSidebarOpen(true)} />
         <main className="p-4 md:p-6 flex-1">{children}</main>
       </div>

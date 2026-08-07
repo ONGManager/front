@@ -456,6 +456,7 @@ export default function Bill() {
                         size="small"
                         variant="outlined"
                         onClick={() => openEditModal(financial)}
+                        className="bg-blue-500! hover:bg-blue-700! text-white!"
                       >
                         Editar
                       </Button>
@@ -464,6 +465,7 @@ export default function Bill() {
                         variant="outlined"
                         color="error"
                         onClick={() => openDeleteDialog(financial)}
+                        className="bg-red-500! hover:bg-red-700! text-white!"
                       >
                         Excluir
                       </Button>
@@ -700,18 +702,18 @@ export default function Bill() {
             </div>
           </div>
         </DialogContent>
-        <DialogActions>
+        <DialogActions className="gap-2 px-4 pb-4">
           <Button
             onClick={closeModal}
             disabled={submitting}
-            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-red-700 bg-red-600"
+            className="bg-red-600! hover:bg-red-700! text-white! text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitting}
-            className="text-white text-sm font-medium px-4 rounded-sm hover:bg-blue-700 bg-blue-600"
+            className="bg-green-600! hover:bg-green-700! text-white! text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <span className="flex items-center gap-2">
@@ -755,8 +757,12 @@ export default function Bill() {
             </p>
           ) : null}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDeleteDialog} disabled={deleting}>
+        <DialogActions className="gap-2 px-4 pb-4">
+          <Button
+            onClick={closeDeleteDialog}
+            disabled={deleting}
+            className="bg-[var(--surface-hover)] text-[var(--text)] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Cancelar
           </Button>
           <Button
@@ -764,6 +770,7 @@ export default function Bill() {
             color="error"
             variant="contained"
             disabled={deleting}
+            className="bg-[var(--danger)] hover:bg-[var(--danger-soft)] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {deleting ? (
               <span className="flex items-center gap-2">

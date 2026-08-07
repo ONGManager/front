@@ -43,13 +43,13 @@ export default function Sidebar({ userRole = "colaborador", isOpen = false, onCl
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] min-w-[220px] h-screen bg-[var(--surface)] border-r border-[var(--surface-border)] flex flex-col px-3 py-4 gap-0.5 transition-transform duration-300 ease-in-out
+        className={`fixed inset-y-0 left-0 z-50 w-[220px] min-w-[220px] h-screen bg-[var(--surface)] border-r border-[var(--surface-border)] flex flex-col px-3 py-4 gap-0.5 overflow-y-auto transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-2 pb-4 mb-2 border-b border-[var(--surface-border)]">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-[var(--surface)] flex items-center justify-center">
               <svg
                 className="w-4 h-4 text-[var(--accent)]"
                 fill="currentColor"
@@ -58,7 +58,7 @@ export default function Sidebar({ userRole = "colaborador", isOpen = false, onCl
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
             </div>
-            <span className="text-[13px] font-semibold text-[var(--accent)] tracking-tight">
+            <span className="text-[18px] font-semibold text-[var(--accent)] tracking-tight">
               ONG Manager
             </span>
           </div>
@@ -112,7 +112,7 @@ export default function Sidebar({ userRole = "colaborador", isOpen = false, onCl
               className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors
                 ${
                   active
-                    ? "bg-[var(--accent-soft)] text-[var(--accent)] font-medium"
+                    ? "bg-[var(--accent-soft)] text-[var(--surdfa)] font-medium"
                     : "text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
                 }`}
             >
