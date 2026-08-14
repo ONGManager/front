@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Header from "@/src/components/header";
 import Sidebar from "@/src/components/sidebar";
+import LoadingScreen from "@/src/components/LoadingScreen";
 import { getOngApi } from "@/src/services/ongService";
 import "@/src/app/globals.css";
 
@@ -54,11 +55,7 @@ export default function PrivateLayout({
   }, [router, pathname, isOngSelectorPage]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] text-[var(--text)]">
-        <p>Carregando...</p>
-      </div>
-    );
+    return <LoadingScreen text="Carregando informações da ONG..." />;
   }
 
   // Se está no OngSelector OU não tem ONG selecionada, mostra sem sidebar

@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getMeApi } from "@/src/services/authService";
+import { getMeApi, updateProfileApi } from "@/src/services/authService";
 import { getOngApi } from "@/src/services/ongService";
+import LoadingScreen from "@/src/components/LoadingScreen";
 import editProfileIcon from "../../../assets/editprofile.svg";
 
 interface UserInfo {
@@ -22,33 +23,42 @@ export default function Profile() {
     role: "",
     ongName: "",
     cnpj: "",
+    oldPassword: "",
+    newPassword: "",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
-      const loadedUser = await getMeApi();
-      if (loadedUser) {
-        setUser(loadedUser);
-        setFormData((prev) => ({
-          ...prev,
-          name: loadedUser.name || "",
-          email: loadedUser.email || "",
-          role: loadedUser.role || "",
-        }));
-      }
+      setLoading(true);
 
-      const selectedOngId = localStorage.getItem("selectedOngId");
-      if (selectedOngId) {
-        try {
+      try {
+        const loadedUser = await getMeApi();
+        if (loadedUser) {
+          setUser(loadedUser);
+          setFormData((prev) => ({
+            ...prev,
+            name: loadedUser.name || "",
+            email: loadedUser.email || "",
+            role: loadedUser.role || "",
+          }));
+        }
+
+        const selectedOngId = localStorage.getItem("selectedOngId");
+        if (selectedOngId) {
           const ongData = await getOngApi(selectedOngId);
           setFormData((prev) => ({
             ...prev,
             ongName: ongData.name || "",
             cnpj: ongData.description || "",
           }));
-        } catch (err) {
-          console.error("Erro ao carregar ONG", err);
         }
+      } catch (err) {
+        console.error("Erro ao carregar perfil", err);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -59,28 +69,101 @@ export default function Profile() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleCancel = () => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        oldPassword: "",
+        newPassword: "",
+      }));
+      setStatusMessage(null);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setStatusMessage(null);
+
+    try {
+      const payload: {
+        name?: string;
+        email?: string;
+        oldPassword?: string;
+        newPassword?: string;
+      } = {
+        name: formData.name,
+        email: formData.email,
+      };
+
+      if (formData.oldPassword && formData.newPassword) {
+        payload.oldPassword = formData.oldPassword;
+        payload.newPassword = formData.newPassword;
+      }
+
+      const updatedUser = await updateProfileApi(payload);
+      setUser(updatedUser);
+      setStatusMessage("Perfil atualizado com sucesso.");
+      setFormData((prev) => ({
+        ...prev,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        oldPassword: "",
+        newPassword: "",
+      }));
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error ? error.message : "Erro ao salvar o perfil.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingScreen text="Carregando perfil..." />;
+  }
+
   return (
     <div className="p-1 md:p-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text)]">Perfil do Usuário</h1>
+          <p className="text-sm text-[var(--muted)] mt-1">
+            Atualize seus dados pessoais e senha em um só lugar.
+          </p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-[var(--accent-soft)] px-4 py-2 rounded-lg text-[var(--accent)] hover:bg-[var(--surface-hover)] cursor-pointer text-sm font-medium transition-colors">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="bg-[var(--accent-soft)] px-4 py-2 rounded-lg text-[var(--accent)] hover:bg-[var(--surface-hover)] cursor-pointer text-sm font-medium transition-colors"
+          >
             Cancelar
           </button>
           <button
-            className="bg-[var(--accent)] px-4 py-2 rounded-lg text-white opacity-60 cursor-not-allowed text-sm font-medium"
-            disabled
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors ${
+              saving
+                ? "bg-[var(--accent-muted)] cursor-not-allowed"
+                : "bg-[var(--accent)] hover:bg-[var(--accent-hover)] cursor-pointer"
+            }`}
           >
-            Salvar Alterações
+            {saving ? "Salvando..." : "Salvar Alterações"}
           </button>
         </div>
       </div>
 
-      <div className="mt-3 text-xs text-[var(--muted)]">
-        Obs: edição de perfil ainda depende de endpoint de atualização no backend.
-      </div>
+      {statusMessage ? (
+        <div className="mt-4 rounded-xl border border-[var(--surface-border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text)]">
+          {statusMessage}
+        </div>
+      ) : null}
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6">
         <div className="flex-1 bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-lg p-6">
@@ -117,11 +200,22 @@ export default function Profile() {
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Telefone</span>
+                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Senha Atual</span>
                   <input
-                    type="text"
-                    value={formData.phone}
-                    onChange={(e) => handleFormChange("phone", e.target.value)}
+                    type="password"
+                    value={formData.oldPassword}
+                    onChange={(e) => handleFormChange("oldPassword", e.target.value)}
+                    placeholder="Digite sua senha atual"
+                    className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                  />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Nova Senha</span>
+                  <input
+                    type="password"
+                    value={formData.newPassword}
+                    onChange={(e) => handleFormChange("newPassword", e.target.value)}
+                    placeholder="Digite a nova senha"
                     className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
                   />
                 </div>

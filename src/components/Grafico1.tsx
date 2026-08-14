@@ -67,11 +67,16 @@ export default function Grafico1({ ongId }: Grafico1Props) {
         continue;
       }
 
+      const amount = Number(item.amount);
+      if (Number.isNaN(amount)) {
+        continue;
+      }
+
       const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
       const currentAmount = monthsMap.get(monthKey) ?? 0;
       monthsMap.set(
         monthKey,
-        currentAmount + (item.type === "receita" ? item.amount : -item.amount),
+        currentAmount + (item.type === "receita" ? amount : -amount),
       );
     }
 
@@ -79,7 +84,7 @@ export default function Grafico1({ ongId }: Grafico1Props) {
       a[0].localeCompare(b[0]),
     );
 
-    return sorted.map(([, value]) => Number(value.toFixed(2)));
+    return sorted.map(([, value]) => Number(Number(value).toFixed(2)));
   }, [financials]);
 
   const categories = useMemo(() => {

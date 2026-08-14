@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
 import LoginPadrao from "../components/Login";
+import LoadingScreen from "@/src/components/LoadingScreen";
 import { loginApi, getMeApi } from "../services/authService";
 import { toast } from "sonner";
 
@@ -49,11 +50,7 @@ export default function Home() {
   };
 
   if (checkingAuth) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p>Carregando...</p>
-      </main>
-    );
+    return <LoadingScreen text="Verificando seus dados..." />;
   }
 
   return (

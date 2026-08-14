@@ -43,3 +43,17 @@ export async function getMeApi() {
 export async function logoutApi() {
   await api.post("/auth/logout");
 }
+
+export async function updateProfileApi(data: {
+  name?: string;
+  email?: string;
+  oldPassword?: string;
+  newPassword?: string;
+}) {
+  try {
+    const { data: response } = await api.patch("/auth/me", data);
+    return response;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Erro ao atualizar perfil"));
+  }
+}
