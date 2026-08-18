@@ -194,7 +194,7 @@ export default function MembersPage() {
       >
         <DialogTitle sx={{ color: "var(--text)" }}>Cadastrar Voluntário</DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
-          <div className="space-y-4 mt-2">
+          <div className="space-y-4 mt-2 gap-4">
             <TextField
               label="Nome"
               value={name}
@@ -262,14 +262,14 @@ export default function MembersPage() {
           <Button
             onClick={() => setModalOpen(false)}
             disabled={submitting}
-            className="bg-[var(--surface-hover)] text-[var(--text)] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="!text-white text-sm font-medium px-4 rounded-sm !hover:bg-red-700 bg-red-600! hover:bg-red-700!"
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            className="!bg-[var(--accent)] !hover:bg-[var(--input-ring)] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-white text-sm font-medium px-4 rounded-sm bg-green-600! hover:bg-green-700!"
             disabled={submitting}
           >
             {submitting ? "Cadastrando..." : "Cadastrar"}
