@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -11,7 +10,6 @@ import {
   TextField,
   MenuItem,
   CircularProgress,
-  IconButton,
   Tooltip,
 } from "@mui/material";
 import { toast } from "sonner";
@@ -133,7 +131,6 @@ export default function EventsPage() {
     setEditingEventId(null);
     setTitle("");
     setDescription("");
-    // Default to tomorrow at 19:00
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(19, 0, 0, 0);
@@ -263,7 +260,6 @@ export default function EventsPage() {
           ? `Presença confirmada para ${guest.name}!`
           : `Check-in desmarcado para ${guest.name}.`
       );
-      // Atualiza lista local e eventos
       setGuests((prev) =>
         prev.map((g) => (g.id === guest.id ? { ...g, status: newStatus } : g))
       );
@@ -349,18 +345,16 @@ export default function EventsPage() {
         </div>
 
         {isAdmin && (
-          <Button
-            variant="contained"
+          <button
+            type="button"
             onClick={handleOpenCreateModal}
-            className="!bg-[var(--accent)] hover:!opacity-90 !text-white !font-semibold !px-5 !py-2.5 !rounded-xl !shadow-sm !capitalize text-sm transition-all"
-            startIcon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            }
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-semibold text-sm shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer"
           >
-            Novo Evento
-          </Button>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Novo Evento</span>
+          </button>
         )}
       </div>
 
@@ -371,7 +365,7 @@ export default function EventsPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
               Total de Eventos
             </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent)]">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center text-purple-600 dark:text-purple-400">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -425,7 +419,7 @@ export default function EventsPage() {
               </svg>
             </div>
           </div>
-          <div className="text-2xl md:text-3xl font-extrabold text-[var(--accent)] mt-3">
+          <div className="text-2xl md:text-3xl font-extrabold text-purple-600 dark:text-purple-400 mt-3">
             {stats.totalGuests}
           </div>
         </div>
@@ -444,7 +438,7 @@ export default function EventsPage() {
             placeholder="Buscar por título ou local do evento..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] placeholder-[var(--icon)] focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)]"
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] placeholder-[var(--icon)] focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
@@ -460,9 +454,9 @@ export default function EventsPage() {
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 statusFilter === tab.id
-                  ? "bg-[var(--accent)] text-white shadow-xs"
+                  ? "bg-purple-600 text-white shadow-xs"
                   : "text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
               }`}
             >
@@ -475,7 +469,7 @@ export default function EventsPage() {
       {/* Grade de Eventos */}
       {filteredEvents.length === 0 ? (
         <div className="text-center py-16 px-4 bg-[var(--surface)] rounded-2xl border border-[var(--surface-border)]">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent)]">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-purple-500/15 flex items-center justify-center text-purple-600 dark:text-purple-400">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
@@ -487,13 +481,13 @@ export default function EventsPage() {
               : "Comece cadastrando o primeiro evento da sua ONG para disponibilizar ingressos aos participantes."}
           </p>
           {isAdmin && !searchTerm && statusFilter === "todos" && (
-            <Button
-              variant="contained"
+            <button
+              type="button"
               onClick={handleOpenCreateModal}
-              className="!mt-4 !bg-[var(--accent)] !text-white !capitalize !rounded-xl"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs transition-all cursor-pointer shadow-sm"
             >
               Cadastrar Primeiro Evento
-            </Button>
+            </button>
           )}
         </div>
       ) : (
@@ -548,9 +542,9 @@ export default function EventsPage() {
                         <Tooltip title="Editar Evento">
                           <button
                             onClick={() => handleOpenEditModal(event)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--icon)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--muted)] hover:text-purple-600 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50 transition-colors cursor-pointer"
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                           </button>
@@ -562,9 +556,9 @@ export default function EventsPage() {
                               setEventToDelete(event);
                               setDeleteDialogOpen(true);
                             }}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </button>
@@ -588,14 +582,14 @@ export default function EventsPage() {
                   {/* Informações de Data e Local */}
                   <div className="space-y-1.5 mb-4">
                     <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
-                      <svg className="w-4 h-4 text-[var(--icon)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span className="font-medium text-[var(--text)]">{dateFormatted}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
-                      <svg className="w-4 h-4 text-[var(--icon)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -618,7 +612,7 @@ export default function EventsPage() {
                             ? "bg-amber-500"
                             : occupancyPct >= 80
                             ? "bg-purple-600"
-                            : "bg-[var(--accent)]"
+                            : "bg-purple-500"
                         }`}
                         style={{ width: `${occupancyPct}%` }}
                       />
@@ -632,33 +626,27 @@ export default function EventsPage() {
 
                 {/* Ações do Rodapé do Card */}
                 <div className="p-3 bg-[var(--surface-hover)] border-t border-[var(--surface-border)] flex items-center justify-between gap-2">
-                  <Button
+                  <button
+                    type="button"
                     onClick={() => handleCopyInviteLink(event)}
-                    variant="outlined"
-                    size="small"
-                    className="!text-xs !capitalize !font-medium !text-[var(--accent)] !border-[var(--accent-border)] hover:!bg-[var(--accent-soft)] !rounded-lg !py-1.5"
-                    startIcon={
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
-                    }
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 active:scale-95 transition-all cursor-pointer"
                   >
-                    Copiar Convite
-                  </Button>
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    <span>Copiar Convite</span>
+                  </button>
 
-                  <Button
+                  <button
+                    type="button"
                     onClick={() => handleOpenGuestsModal(event)}
-                    variant="contained"
-                    size="small"
-                    className="!text-xs !capitalize !font-semibold !bg-[var(--accent)] hover:!opacity-90 !text-white !rounded-lg !py-1.5"
-                    startIcon={
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                    }
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-xs hover:shadow-md active:scale-95 transition-all cursor-pointer"
                   >
-                    Inscritos ({event.totalGuests})
-                  </Button>
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span>Inscritos ({event.totalGuests})</span>
+                  </button>
                 </div>
               </div>
             );
@@ -705,7 +693,7 @@ export default function EventsPage() {
                   borderRadius: 2,
                   "& fieldset": { borderColor: "var(--input-border)" },
                   "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                  "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                 },
               }}
             />
@@ -727,7 +715,7 @@ export default function EventsPage() {
                   borderRadius: 2,
                   "& fieldset": { borderColor: "var(--input-border)" },
                   "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                  "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                 },
               }}
             />
@@ -750,7 +738,7 @@ export default function EventsPage() {
                     borderRadius: 2,
                     "& fieldset": { borderColor: "var(--input-border)" },
                     "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                    "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                    "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                   },
                 }}
               />
@@ -772,7 +760,7 @@ export default function EventsPage() {
                     borderRadius: 2,
                     "& fieldset": { borderColor: "var(--input-border)" },
                     "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                    "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                    "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                   },
                 }}
               />
@@ -793,7 +781,7 @@ export default function EventsPage() {
                   borderRadius: 2,
                   "& fieldset": { borderColor: "var(--input-border)" },
                   "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                  "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                 },
               }}
             />
@@ -816,7 +804,7 @@ export default function EventsPage() {
                     borderRadius: 2,
                     "& fieldset": { borderColor: "var(--input-border)" },
                     "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                    "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+                    "&.Mui-focused fieldset": { borderColor: "#9333ea" },
                   },
                 }}
               >
@@ -828,27 +816,28 @@ export default function EventsPage() {
           </div>
         </DialogContent>
         <DialogActions className="gap-2 px-6 pb-4">
-          <Button
+          <button
+            type="button"
             onClick={() => setEventModalOpen(false)}
             disabled={submittingEvent}
-            className="!text-sm !font-semibold !text-[var(--muted)] !capitalize"
+            className="px-4 py-2 text-xs font-semibold rounded-xl text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors cursor-pointer"
           >
             Cancelar
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={handleSaveEvent}
-            variant="contained"
             disabled={submittingEvent}
-            className="!bg-[var(--accent)] hover:!opacity-90 !text-white !font-semibold !px-5 !py-2 !rounded-xl !capitalize"
+            className="px-5 py-2.5 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
           >
             {submittingEvent ? (
-              <CircularProgress size={20} sx={{ color: "white" }} />
+              <CircularProgress size={16} sx={{ color: "white" }} />
             ) : editingEventId ? (
               "Salvar Alterações"
             ) : (
               "Criar Evento"
             )}
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
 
@@ -871,47 +860,41 @@ export default function EventsPage() {
         }}
       >
         <DialogTitle>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--surface-border)] pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--surface-border)] pb-3">
             <div>
               <h2 className="text-xl font-bold text-[var(--text)]">
                 Inscritos no Evento
               </h2>
-              <p className="text-xs text-[var(--muted)] mt-0.5">
+              <p className="text-xs text-[var(--muted)] mt-0.5 font-medium">
                 {selectedEventForGuests?.title}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
               {selectedEventForGuests && (
-                <Button
+                <button
+                  type="button"
                   onClick={() => handleCopyInviteLink(selectedEventForGuests)}
-                  variant="outlined"
-                  size="small"
-                  className="!text-xs !capitalize !font-medium !text-[var(--accent)] !border-[var(--accent-border)] !rounded-lg"
-                  startIcon={
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                  }
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 active:scale-95 transition-all cursor-pointer"
                 >
-                  Copiar Convite
-                </Button>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  <span>Copiar Convite</span>
+                </button>
               )}
 
-              <Button
+              <button
+                type="button"
                 onClick={handleExportGuestsCSV}
-                variant="contained"
-                size="small"
                 disabled={guests.length === 0}
-                className="!text-xs !capitalize !font-semibold !bg-[var(--accent)] !text-white !rounded-lg"
-                startIcon={
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                }
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-xs hover:shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
-                Exportar CSV
-              </Button>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Exportar CSV</span>
+              </button>
             </div>
           </div>
         </DialogTitle>
@@ -919,29 +902,29 @@ export default function EventsPage() {
         <DialogContent>
           {/* Métricas rápidas do evento selecionado */}
           <div className="grid grid-cols-3 gap-3 my-3">
-            <div className="p-2.5 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
+            <div className="p-3 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
                 Inscritos
               </span>
-              <div className="text-lg font-bold text-[var(--text)]">
+              <div className="text-lg font-extrabold text-[var(--text)] mt-0.5">
                 {guests.filter((g) => g.status !== "cancelado").length} / {selectedEventForGuests?.maxTickets}
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
+            <div className="p-3 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
                 Presenças Confirmadas
               </span>
-              <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
                 {guests.filter((g) => g.status === "presente").length}
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
+            <div className="p-3 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
                 Vagas Restantes
               </span>
-              <div className="text-lg font-bold text-[var(--accent)]">
+              <div className="text-lg font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
                 {Math.max(
                   0,
                   (selectedEventForGuests?.maxTickets || 0) -
@@ -958,7 +941,7 @@ export default function EventsPage() {
               placeholder="Buscar por nome, e-mail ou código do ingresso..."
               value={guestSearch}
               onChange={(e) => setGuestSearch(e.target.value)}
-              className="flex-1 px-3 py-2 text-xs rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] placeholder-[var(--icon)] focus:outline-none focus:ring-1 focus:ring-[var(--input-ring)]"
+              className="flex-1 px-3 py-2 text-xs rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] placeholder-[var(--icon)] focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
 
             <div className="flex items-center gap-1 shrink-0">
@@ -966,10 +949,10 @@ export default function EventsPage() {
                 <button
                   key={st}
                   onClick={() => setGuestStatusFilter(st)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium capitalize transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
                     guestStatusFilter === st
-                      ? "bg-[var(--accent)] text-white"
-                      : "text-[var(--muted)] hover:bg-[var(--surface-hover)]"
+                      ? "bg-purple-600 text-white shadow-2xs"
+                      : "bg-[var(--surface-hover)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--surface-border)]"
                   }`}
                 >
                   {st}
@@ -981,7 +964,7 @@ export default function EventsPage() {
           {/* Tabela de Inscritos */}
           {loadingGuests ? (
             <div className="flex items-center justify-center py-12">
-              <CircularProgress size={28} sx={{ color: "var(--accent)" }} />
+              <CircularProgress size={28} sx={{ color: "#9333ea" }} />
             </div>
           ) : filteredGuests.length === 0 ? (
             <div className="text-center py-12 text-[var(--muted)] text-sm">
@@ -1007,19 +990,19 @@ export default function EventsPage() {
                         <div className="text-[11px] text-[var(--muted)]">{guest.email}</div>
                       </td>
 
-                      <td className="py-2.5 px-3 text-[var(--muted)]">
+                      <td className="py-2.5 px-3 text-[var(--muted)] font-medium">
                         {guest.phone || "-"}
                       </td>
 
                       <td className="py-2.5 px-3">
-                        <span className="font-mono text-[11px] px-2 py-0.5 rounded-md bg-[var(--surface-hover)] border border-[var(--surface-border)] text-[var(--text)]">
+                        <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
                           {guest.ticketCode}
                         </span>
                       </td>
 
                       <td className="py-2.5 px-3">
                         <span
-                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold capitalize ${
                             guest.status === "presente"
                               ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                               : guest.status === "confirmado"
@@ -1033,24 +1016,33 @@ export default function EventsPage() {
 
                       {isAdmin && (
                         <td className="py-2.5 px-3 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Tooltip title={guest.status === "presente" ? "Desmarcar Presença" : "Marcar Presença"}>
-                              <button
-                                onClick={() => handleToggleGuestPresence(guest)}
-                                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-                                  guest.status === "presente"
-                                    ? "bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25"
-                                    : "bg-[var(--accent-soft)] text-[var(--accent)] hover:opacity-80"
-                                }`}
-                              >
-                                {guest.status === "presente" ? "Presente ✓" : "Check-in"}
-                              </button>
-                            </Tooltip>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleGuestPresence(guest)}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                                guest.status === "presente"
+                                  ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25"
+                                  : "bg-purple-600 hover:bg-purple-700 text-white shadow-2xs active:scale-95"
+                              }`}
+                            >
+                              {guest.status === "presente" ? (
+                                <>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  <span>Presente</span>
+                                </>
+                              ) : (
+                                "Check-in"
+                              )}
+                            </button>
 
                             <Tooltip title="Remover Inscrição (libera 1 vaga)">
                               <button
+                                type="button"
                                 onClick={() => handleDeleteGuest(guest)}
-                                className="w-6 h-6 rounded-lg flex items-center justify-center text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-colors cursor-pointer"
+                                className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
                               >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1068,13 +1060,13 @@ export default function EventsPage() {
           )}
         </DialogContent>
         <DialogActions className="px-6 pb-4">
-          <Button
+          <button
+            type="button"
             onClick={() => setGuestsModalOpen(false)}
-            variant="contained"
-            className="!bg-[var(--accent)] !text-white !capitalize !rounded-xl text-xs"
+            className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--surface-hover)] hover:bg-[var(--surface-border)] text-[var(--text)] border border-[var(--surface-border)] transition-colors cursor-pointer"
           >
             Fechar
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
 
@@ -1107,21 +1099,22 @@ export default function EventsPage() {
           </p>
         </DialogContent>
         <DialogActions className="gap-2 px-6 pb-4">
-          <Button
+          <button
+            type="button"
             onClick={() => setDeleteDialogOpen(false)}
             disabled={deleting}
-            className="!text-xs !font-semibold !text-[var(--muted)] !capitalize"
+            className="px-4 py-2 text-xs font-semibold rounded-xl text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors cursor-pointer"
           >
             Cancelar
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={handleDeleteEvent}
-            variant="contained"
             disabled={deleting}
-            className="!bg-[var(--danger)] hover:!opacity-90 !text-white !font-semibold !px-4 !py-1.5 !rounded-xl !capitalize text-xs"
+            className="px-4 py-2 text-xs font-bold rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
-            {deleting ? <CircularProgress size={16} sx={{ color: "white" }} /> : "Excluir Evento"}
-          </Button>
+            {deleting ? <CircularProgress size={14} sx={{ color: "white" }} /> : "Excluir Evento"}
+          </button>
         </DialogActions>
       </Dialog>
     </div>
