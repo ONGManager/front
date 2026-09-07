@@ -9,6 +9,12 @@ export interface EventItem {
   maxTickets: number;
   status: "ativo" | "encerrado" | "cancelado";
   inviteToken: string;
+  hasLandingPage: boolean;
+  landingTemplate?: "modern" | "warm" | "minimal" | null;
+  primaryColor?: string | null;
+  bannerUrl?: string | null;
+  ctaText?: string | null;
+  landingPageUrl?: string | null;
   ongId: string;
   totalGuests: number;
   checkedInGuests: number;
@@ -48,6 +54,11 @@ export interface PublicEvent {
   isSoldOut: boolean;
   status: "ativo" | "encerrado" | "cancelado";
   inviteToken: string;
+  hasLandingPage?: boolean;
+  landingTemplate?: "modern" | "warm" | "minimal" | null;
+  primaryColor?: string | null;
+  bannerUrl?: string | null;
+  ctaText?: string | null;
   ong: {
     id: string;
     name: string;
@@ -61,6 +72,11 @@ export interface CreateEventPayload {
   date: string;
   location?: string;
   maxTickets: number;
+  hasLandingPage?: boolean;
+  landingTemplate?: "modern" | "warm" | "minimal";
+  primaryColor?: string;
+  bannerUrl?: string;
+  ctaText?: string;
 }
 
 export interface UpdateEventPayload {
@@ -70,6 +86,11 @@ export interface UpdateEventPayload {
   location?: string;
   maxTickets?: number;
   status?: "ativo" | "encerrado" | "cancelado";
+  hasLandingPage?: boolean;
+  landingTemplate?: "modern" | "warm" | "minimal";
+  primaryColor?: string;
+  bannerUrl?: string;
+  ctaText?: string;
 }
 
 export interface RegisterGuestPayload {
@@ -186,7 +207,7 @@ export async function deleteGuestApi(
 }
 
 // ============================================
-// SERVIÇOS PÚBLICOS (Para convidados / participantes)
+// SERVIÇOS PÚBLICOS (Para convidados / participantes / Landing Page)
 // ============================================
 
 export async function getPublicEventApi(token: string): Promise<PublicEvent> {
@@ -195,6 +216,15 @@ export async function getPublicEventApi(token: string): Promise<PublicEvent> {
     return response.data;
   } catch (error) {
     throw new Error(getApiErrorMessage(error, "Erro ao carregar dados do convite de evento"));
+  }
+}
+
+export async function getPublicLandingPageApi(eventId: string): Promise<PublicEvent> {
+  try {
+    const response = await api.get<PublicEvent>(`/events/public/landing/${eventId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Erro ao carregar Landing Page do evento"));
   }
 }
 
