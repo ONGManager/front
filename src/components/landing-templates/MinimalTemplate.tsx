@@ -47,20 +47,20 @@ export default function MinimalTemplate({
       <div className="w-full h-1" style={{ backgroundColor: primaryColor }} />
 
       {/* Header Minimalista */}
-      <header className="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between border-b border-zinc-100">
-        <div className="flex items-center gap-3">
+      <header className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-8 flex items-center justify-between gap-2 border-b border-zinc-100">
+        <div className="flex items-center gap-2.5 min-w-0 pr-2">
           <span
-            className="w-2.5 h-2.5 rounded-full"
+            className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{ backgroundColor: primaryColor }}
           />
-          <span className="font-semibold text-xs tracking-widest uppercase text-zinc-800">
+          <span className="font-semibold text-xs tracking-widest uppercase text-zinc-800 truncate">
             {event.ong?.name || "Organização"}
           </span>
         </div>
 
         <a
           href="#inscricao"
-          className="text-xs font-semibold uppercase tracking-wider transition-colors hover:opacity-80"
+          className="text-xs font-semibold uppercase tracking-wider transition-colors hover:opacity-80 shrink-0"
           style={{ color: primaryColor }}
         >
           {ctaText || "Inscrição"} ↗
@@ -68,9 +68,9 @@ export default function MinimalTemplate({
       </header>
 
       {/* Hero Editorial */}
-      <section className="max-w-5xl mx-auto px-6 pt-16 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 space-y-6">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-16 pb-12 sm:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+          <div className="lg:col-span-7 space-y-5 sm:space-y-6">
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400">
                 Edição Especial
@@ -84,19 +84,19 @@ export default function MinimalTemplate({
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-serif font-light text-zinc-900 leading-[1.1] tracking-tight">
+            <h1 className="text-2xl sm:text-5xl md:text-6xl font-serif font-light text-zinc-900 leading-[1.15] tracking-tight break-words">
               {event.title || "Um Encontro Dedicado ao Futuro"}
             </h1>
 
-            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed max-w-lg">
+            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed max-w-lg break-words">
               {event.description ||
                 "Uma conferência pensada para conectar propósitos e pessoas comprometidas com a transformação social e sustentabilidade."}
             </p>
 
-            <div className="pt-4 flex items-center gap-6">
+            <div className="pt-2 sm:pt-4 flex flex-wrap items-center gap-4 sm:gap-6">
               <a
                 href="#inscricao"
-                className="px-6 py-3 rounded-none text-white text-xs font-semibold tracking-wider uppercase shadow-xs hover:opacity-90 active:scale-95 transition-all"
+                className="px-6 py-3 rounded-none text-white text-xs font-semibold tracking-wider uppercase shadow-xs hover:opacity-90 active:scale-95 transition-all text-center w-full sm:w-auto"
                 style={{ backgroundColor: primaryColor }}
               >
                 {ctaText || "Confirmar Presença"}
@@ -106,7 +106,7 @@ export default function MinimalTemplate({
           </div>
 
           {/* Card Lateral de Dados Práticos */}
-          <div className="lg:col-span-5 bg-zinc-50 p-8 border border-zinc-200/60 rounded-none space-y-6">
+          <div className="lg:col-span-5 bg-zinc-50 p-5 sm:p-8 border border-zinc-200/60 rounded-none space-y-5 sm:space-y-6">
             <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-400 border-b border-zinc-200 pb-3">
               Informações do Evento
             </h3>

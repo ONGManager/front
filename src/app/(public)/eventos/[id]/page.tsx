@@ -10,6 +10,32 @@ import {
 } from "@/src/services/eventService";
 import TemplateRenderer from "@/src/components/landing-templates/TemplateRenderer";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+async function fetchPublicLanding(eventId: string): Promise<PublicEvent> {
+  const res = await fetch(`${API_URL}/events/public/landing/${eventId}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Erro ao carregar página do evento.");
+  }
+  return res.json();
+}
+
+async function registerGuest(token: string, data: { name: string; email: string; phone?: string }) {
+  const res = await fetch(`${API_URL}/events/public/${token}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Erro ao realizar inscrição.");
+  }
+  return res.json();
+}
+
 export default function PublicEventLandingPage() {
   const params = useParams();
   const router = useRouter();
@@ -36,7 +62,7 @@ export default function PublicEventLandingPage() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getPublicLandingPageApi(eventId);
+        const data = await fetchPublicLanding(eventId);
         setEvent(data);
       } catch (err: any) {
         setError(err?.message || "Não foi possível carregar a página deste evento.");
@@ -56,7 +82,7 @@ export default function PublicEventLandingPage() {
 
     setSubmitting(true);
     try {
-      const response = await registerPublicGuestApi(event.inviteToken, formData);
+      const response = await registerGuest(event.inviteToken, formData);
       toast.success("Inscrição confirmada com sucesso! Seu ingresso foi gerado.");
       setTicketResult({
         ticketCode: response.guest.ticketCode,

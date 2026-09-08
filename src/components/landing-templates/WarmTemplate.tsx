@@ -51,25 +51,25 @@ export default function WarmTemplate({
       </div>
 
       {/* Header */}
-      <header className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0 pr-2">
           <div
-            className="w-10 h-10 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-xs"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-xs shrink-0"
             style={{ backgroundColor: primaryColor }}
           >
             🤝
           </div>
-          <div>
-            <span className="block font-extrabold text-sm text-stone-900 leading-tight">
+          <div className="min-w-0">
+            <span className="block font-extrabold text-xs sm:text-sm text-stone-900 leading-tight truncate">
               {event.ong?.name || "ONG Beneficente"}
             </span>
-            <span className="text-[11px] text-stone-500">Unindo pessoas por um propósito</span>
+            <span className="text-[10px] sm:text-[11px] text-stone-500 truncate block">Unindo pessoas por um propósito</span>
           </div>
         </div>
 
         <a
           href="#inscricao"
-          className="px-5 py-2.5 rounded-full font-bold text-xs text-white shadow-sm hover:opacity-90 active:scale-95 transition-all"
+          className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full font-bold text-xs text-white shadow-sm hover:opacity-90 active:scale-95 transition-all shrink-0"
           style={{ backgroundColor: primaryColor }}
         >
           {ctaText || "Fazer Inscrição"}
@@ -77,9 +77,9 @@ export default function WarmTemplate({
       </header>
 
       {/* Hero Acolhedor */}
-      <section className="max-w-4xl mx-auto px-6 pt-10 pb-16 text-center">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-12 sm:pb-16 text-center">
         <span
-          className="inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-4"
+          className="inline-block px-3.5 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold mb-4"
           style={{
             backgroundColor: `${primaryColor}18`,
             color: primaryColor,
@@ -88,11 +88,11 @@ export default function WarmTemplate({
           Encontro Aberto à Comunidade
         </span>
 
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-stone-900 tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-stone-900 tracking-tight leading-tight break-words">
           {event.title || "Um Encontro Especial para Fazer a Diferença"}
         </h1>
 
-        <p className="mt-5 text-base sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-4 sm:mt-5 text-sm sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed break-words">
           {event.description ||
             "Estamos preparando um espaço acolhedor repleto de troca, apoio mútuo e solidariedade. Sua presença é fundamental para tornar este momento inesquecível."}
         </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -36,6 +37,100 @@ const COLOR_PRESETS = [
   { name: "Âmbar Solar", hex: "#d97706" },
   { name: "Grafite Noturno", hex: "#334155" },
 ];
+
+function MobileDeviceFrame({ children }: { children: React.ReactNode }) {
+  const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
+  const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!iframeRef) return;
+    const doc = iframeRef.contentDocument || iframeRef.contentWindow?.document;
+    if (!doc) return;
+
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html lang="pt-BR" class="dark">
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <title>Preview Mobile</title>
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              min-height: 100%;
+              overflow-x: hidden;
+              background-color: #020617;
+              -webkit-font-smoothing: antialiased;
+            }
+            ::-webkit-scrollbar {
+              width: 4px;
+            }
+            ::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 4px;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="mobile-preview-root"></div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    const iframeHead = doc.head;
+    const copyStyles = () => {
+      const existing = iframeHead.querySelectorAll("link[data-cloned], style[data-cloned]");
+      existing.forEach((el) => el.remove());
+
+      document.querySelectorAll("link[rel='stylesheet'], style").forEach((node) => {
+        const clone = node.cloneNode(true) as HTMLElement;
+        clone.setAttribute("data-cloned", "true");
+        iframeHead.appendChild(clone);
+      });
+    };
+    copyStyles();
+
+    const observer = new MutationObserver(() => {
+      copyStyles();
+    });
+    observer.observe(document.head, { childList: true, subtree: true });
+
+    const root = doc.getElementById("mobile-preview-root");
+    setMountNode(root);
+
+    return () => observer.disconnect();
+  }, [iframeRef]);
+
+  return (
+    <div className="w-[375px] my-2 rounded-[44px] border-[10px] border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative flex flex-col items-center shrink-0">
+      {/* Notch e Status Bar */}
+      <div className="w-full h-7 bg-slate-900 flex items-center justify-between px-6 text-[10px] text-slate-400 select-none z-20 shrink-0">
+        <span className="font-semibold">9:41</span>
+        <div className="w-20 h-3.5 bg-black rounded-full" />
+        <span className="font-mono">5G 100%</span>
+      </div>
+
+      {/* Viewport de 355px real interna */}
+      <div className="w-full h-[640px] relative overflow-hidden bg-slate-950">
+        <iframe
+          ref={setIframeRef}
+          title="Pré-visualização Mobile Real"
+          className="w-full h-full border-0 block"
+        />
+        {mountNode && createPortal(children, mountNode)}
+      </div>
+
+      {/* Barra Inferior (Home Indicator) */}
+      <div className="w-full h-5 bg-slate-900 flex items-center justify-center shrink-0 z-20">
+        <div className="w-32 h-1 bg-slate-600 rounded-full" />
+      </div>
+    </div>
+  );
+}
 
 export default function EventsPage() {
   const router = useRouter();
@@ -1192,26 +1287,14 @@ export default function EventsPage() {
               />
             </div>
           ) : (
-            <div className="w-[375px] my-4 rounded-[40px] border-[10px] border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative">
-              {/* Notch / Barra Superior do Celular */}
-              <div className="h-6 bg-slate-900 flex items-center justify-between px-6 text-[10px] text-slate-400 select-none">
-                <span>9:41</span>
-                <div className="w-16 h-3 bg-black rounded-full" />
-                <span>5G 100%</span>
-              </div>
-              <div className="max-h-[640px] overflow-y-auto">
-                <TemplateRenderer
-                  template={landingTemplate}
-                  event={previewEventData}
-                  primaryColor={primaryColor}
-                  ctaText={ctaText}
-                />
-              </div>
-              {/* Home Indicator */}
-              <div className="h-4 bg-slate-900 flex items-center justify-center">
-                <div className="w-28 h-1 bg-slate-600 rounded-full" />
-              </div>
-            </div>
+            <MobileDeviceFrame>
+              <TemplateRenderer
+                template={landingTemplate}
+                event={previewEventData}
+                primaryColor={primaryColor}
+                ctaText={ctaText}
+              />
+            </MobileDeviceFrame>
           )}
         </div>
       </Dialog>
