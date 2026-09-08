@@ -25,6 +25,17 @@ import {
   EventGuest,
 } from "@/src/services/eventService";
 import { getOngApi } from "@/src/services/ongService";
+import TemplateSelector from "@/src/components/landing-templates/TemplateSelector";
+import TemplateRenderer from "@/src/components/landing-templates/TemplateRenderer";
+
+const COLOR_PRESETS = [
+  { name: "Roxo Real", hex: "#7c3aed" },
+  { name: "Azul Oceano", hex: "#2563eb" },
+  { name: "Verde Esmeralda", hex: "#059669" },
+  { name: "Coral Vivo", hex: "#e11d48" },
+  { name: "Âmbar Solar", hex: "#d97706" },
+  { name: "Grafite Noturno", hex: "#334155" },
+];
 
 export default function EventsPage() {
   const router = useRouter();
@@ -47,6 +58,17 @@ export default function EventsPage() {
   const [maxTickets, setMaxTickets] = useState<number | "">(50);
   const [eventStatus, setEventStatus] = useState<"ativo" | "encerrado" | "cancelado">("ativo");
   const [submittingEvent, setSubmittingEvent] = useState(false);
+
+  // Estados de Landing Page
+  const [hasLandingPage, setHasLandingPage] = useState(false);
+  const [landingTemplate, setLandingTemplate] = useState<"modern" | "warm" | "minimal">("modern");
+  const [primaryColor, setPrimaryColor] = useState("#7c3aed");
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [ctaText, setCtaText] = useState("Garantir meu Ingresso");
+
+  // Modal de Pré-visualização em Tempo Real (Live Preview)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewViewport, setPreviewViewport] = useState<"desktop" | "mobile">("desktop");
 
   // Modal de Gestão de Convidados / Inscritos
   const [guestsModalOpen, setGuestsModalOpen] = useState(false);
@@ -139,6 +161,11 @@ export default function EventsPage() {
     setLocation("");
     setMaxTickets(50);
     setEventStatus("ativo");
+    setHasLandingPage(false);
+    setLandingTemplate("modern");
+    setPrimaryColor("#7c3aed");
+    setBannerUrl("");
+    setCtaText("Garantir meu Ingresso");
     setEventModalOpen(true);
   };
 
@@ -156,6 +183,11 @@ export default function EventsPage() {
     setLocation(event.location || "");
     setMaxTickets(event.maxTickets);
     setEventStatus(event.status);
+    setHasLandingPage(Boolean(event.hasLandingPage));
+    setLandingTemplate(event.landingTemplate || "modern");
+    setPrimaryColor(event.primaryColor || "#7c3aed");
+    setBannerUrl(event.bannerUrl || "");
+    setCtaText(event.ctaText || "Garantir meu Ingresso");
     setEventModalOpen(true);
   };
 
@@ -168,6 +200,10 @@ export default function EventsPage() {
       toast.error("A data e horário do evento são obrigatórios.");
       return;
     }
+    if (!description.trim()) {
+      toast.error("A descrição do evento é obrigatória.");
+      return;
+    }
     if (!maxTickets || Number(maxTickets) < 1) {
       toast.error("A quantidade de ingressos deve ser de no mínimo 1.");
       return;
@@ -178,20 +214,30 @@ export default function EventsPage() {
       if (editingEventId) {
         await updateEventApi(ongId, editingEventId, {
           title: title.trim(),
-          description: description.trim() || undefined,
+          description: description.trim(),
           date: new Date(date).toISOString(),
           location: location.trim() || undefined,
           maxTickets: Number(maxTickets),
           status: eventStatus,
+          hasLandingPage,
+          landingTemplate: hasLandingPage ? landingTemplate : undefined,
+          primaryColor: hasLandingPage ? primaryColor : undefined,
+          bannerUrl: hasLandingPage && bannerUrl.trim() ? bannerUrl.trim() : undefined,
+          ctaText: hasLandingPage && ctaText.trim() ? ctaText.trim() : undefined,
         });
         toast.success("Evento atualizado com sucesso!");
       } else {
         await createEventApi(ongId, {
           title: title.trim(),
-          description: description.trim() || undefined,
+          description: description.trim(),
           date: new Date(date).toISOString(),
           location: location.trim() || undefined,
           maxTickets: Number(maxTickets),
+          hasLandingPage,
+          landingTemplate: hasLandingPage ? landingTemplate : undefined,
+          primaryColor: hasLandingPage ? primaryColor : undefined,
+          bannerUrl: hasLandingPage && bannerUrl.trim() ? bannerUrl.trim() : undefined,
+          ctaText: hasLandingPage && ctaText.trim() ? ctaText.trim() : undefined,
         });
         toast.success("Evento cadastrado com sucesso!");
       }
@@ -202,6 +248,54 @@ export default function EventsPage() {
     } finally {
       setSubmittingEvent(false);
     }
+  };
+
+  // Objeto de dados simulados em tempo real para o Live Preview
+  const previewEventData = useMemo(() => {
+    return {
+      id: "preview-event-id",
+      title: title.trim() || "Título do Evento em Destaque",
+      description:
+        description.trim() ||
+        "Uma descrição envolvente do evento que engaja os participantes e apresenta a causa e o impacto transformador da ONG.",
+      date: date ? new Date(date).toISOString() : new Date().toISOString(),
+      location: location.trim() || "Local do Evento / Transmissão Online",
+      maxTickets: Number(maxTickets) || 50,
+      totalGuests: 12,
+      remainingTickets: Math.max(0, (Number(maxTickets) || 50) - 12),
+      isSoldOut: false,
+      status: "ativo" as const,
+      inviteToken: "preview-token",
+      hasLandingPage: true,
+      landingTemplate,
+      primaryColor,
+      bannerUrl: bannerUrl.trim() || null,
+      ctaText: ctaText.trim() || "Garantir meu Ingresso",
+      ong: {
+        id: ongId,
+        name: "Sua ONG / Organização",
+        description: "Transformando vidas e comunidades através da união e dedicação.",
+      },
+    };
+  }, [
+    title,
+    description,
+    date,
+    location,
+    maxTickets,
+    landingTemplate,
+    primaryColor,
+    bannerUrl,
+    ctaText,
+    ongId,
+  ]);
+
+  // Copiar link da Landing Page
+  const handleCopyLandingLink = (event: EventItem) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const fullUrl = `${origin}/eventos/${event.id}`;
+    navigator.clipboard.writeText(fullUrl);
+    toast.success("Link da Landing Page copiado!");
   };
 
   const handleDeleteEvent = async () => {
@@ -535,6 +629,13 @@ export default function EventsPage() {
                           Esgotado
                         </span>
                       )}
+
+                      {event.hasLandingPage && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
+                          <span>✨</span>
+                          <span>Landing Page</span>
+                        </span>
+                      )}
                     </div>
 
                     {isAdmin && (
@@ -625,17 +726,35 @@ export default function EventsPage() {
                 </div>
 
                 {/* Ações do Rodapé do Card */}
-                <div className="p-3 bg-[var(--surface-hover)] border-t border-[var(--surface-border)] flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleCopyInviteLink(event)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>Copiar Convite</span>
-                  </button>
+                <div className="p-3 bg-[var(--surface-hover)] border-t border-[var(--surface-border)] flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyInviteLink(event)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 active:scale-95 transition-all cursor-pointer"
+                      title="Copiar link de convite rápido"
+                    >
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                      <span>Convite</span>
+                    </button>
+
+                    {event.hasLandingPage && (
+                      <a
+                        href={`/eventos/${event.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 active:scale-95 transition-all cursor-pointer"
+                        title="Abrir landing page pública em nova aba"
+                      >
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        <span>Landing Page</span>
+                      </a>
+                    )}
+                  </div>
 
                   <button
                     type="button"
@@ -660,7 +779,7 @@ export default function EventsPage() {
       <Dialog
         open={eventModalOpen}
         onClose={() => !submittingEvent && setEventModalOpen(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         PaperProps={{
           sx: {
@@ -699,13 +818,14 @@ export default function EventsPage() {
             />
 
             <TextField
-              label="Descrição do Evento"
+              label="Descrição do Evento *"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
+              required
               multiline
               rows={3}
-              placeholder="Informações adicionais, programação, instruções aos convidados..."
+              placeholder="Informações detalhadas, programação, impacto social, instruções aos convidados..."
               sx={{
                 "& .MuiInputLabel-root": { color: "var(--muted)" },
                 "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
@@ -813,6 +933,147 @@ export default function EventsPage() {
                 <MenuItem value="cancelado">Cancelado</MenuItem>
               </TextField>
             )}
+
+            {/* SEÇÃO: PÁGINA DE DIVULGAÇÃO / LANDING PAGE */}
+            <div className="pt-2 border-t border-[var(--surface-border)] space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/70 dark:border-purple-800/50">
+                <div className="pr-4">
+                  <h4 className="text-sm font-bold text-[var(--text)] flex items-center gap-2">
+                    <span>✨</span>
+                    <span>Gerar página de divulgação para este evento?</span>
+                  </h4>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">
+                    Gera automaticamente uma landing page pública, animada e responsiva com template customizável.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={hasLandingPage}
+                    onChange={(e) => setHasLandingPage(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              {hasLandingPage && (
+                <div className="space-y-4 p-4 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                  {/* Galeria de Templates */}
+                  <TemplateSelector
+                    selectedTemplate={landingTemplate}
+                    onChange={setLandingTemplate}
+                    primaryColor={primaryColor}
+                  />
+
+                  {/* Cor Principal (Color Picker) */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-[var(--text)]">
+                      Cor Principal de Destaque
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      {COLOR_PRESETS.map((p) => (
+                        <button
+                          key={p.hex}
+                          type="button"
+                          onClick={() => setPrimaryColor(p.hex)}
+                          className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                            primaryColor.toLowerCase() === p.hex.toLowerCase()
+                              ? "border-purple-600 bg-white dark:bg-slate-800 shadow-xs ring-2 ring-purple-500/20"
+                              : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 hover:border-slate-300"
+                          }`}
+                        >
+                          <span
+                            className="w-3.5 h-3.5 rounded-full shadow-inner"
+                            style={{ backgroundColor: p.hex }}
+                          />
+                          <span className="text-[var(--text)]">{p.name}</span>
+                        </button>
+                      ))}
+
+                      {/* Seletor Customizado Hex */}
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                        <input
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent"
+                          title="Escolher cor personalizada"
+                        />
+                        <span className="text-xs font-mono font-medium text-[var(--muted)] uppercase">
+                          {primaryColor}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Campos Adicionais: Banner e CTA */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <TextField
+                      label="Imagem de Capa / Banner (URL)"
+                      value={bannerUrl}
+                      onChange={(e) => setBannerUrl(e.target.value)}
+                      fullWidth
+                      placeholder="https://images.unsplash.com/..."
+                      helperText="Opcional. Uma foto marcante que ilustre a causa."
+                      sx={{
+                        "& .MuiInputLabel-root": { color: "var(--muted)" },
+                        "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+                        "& .MuiFormHelperText-root": { color: "var(--muted)" },
+                        "& .MuiOutlinedInput-root": {
+                          color: "var(--text)",
+                          bgcolor: "var(--input)",
+                          borderRadius: 2,
+                          "& fieldset": { borderColor: "var(--input-border)" },
+                          "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                          "&.Mui-focused fieldset": { borderColor: "#9333ea" },
+                        },
+                      }}
+                    />
+
+                    <TextField
+                      label="Texto do Botão de Inscrição (CTA)"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      fullWidth
+                      placeholder="Ex: Garantir meu Ingresso, Quero Participar..."
+                      helperText="Texto destacado no botão principal de conversão."
+                      sx={{
+                        "& .MuiInputLabel-root": { color: "var(--muted)" },
+                        "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+                        "& .MuiFormHelperText-root": { color: "var(--muted)" },
+                        "& .MuiOutlinedInput-root": {
+                          color: "var(--text)",
+                          bgcolor: "var(--input)",
+                          borderRadius: 2,
+                          "& fieldset": { borderColor: "var(--input-border)" },
+                          "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                          "&.Mui-focused fieldset": { borderColor: "#9333ea" },
+                        },
+                      }}
+                    />
+                  </div>
+
+                  {/* Botão de Live Preview */}
+                  <div className="flex items-center justify-between pt-2 border-t border-[var(--surface-border)]">
+                    <p className="text-xs text-[var(--muted)]">
+                      Visualize como os participantes verão a página com os dados digitados acima.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-xs hover:shadow-md active:scale-95 transition-all cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span>Live Preview em Tempo Real</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
         <DialogActions className="gap-2 px-6 pb-4">
@@ -839,6 +1100,120 @@ export default function EventsPage() {
             )}
           </button>
         </DialogActions>
+      </Dialog>
+
+      {/* ======================================================== */}
+      {/* MODAL: LIVE PREVIEW DA LANDING PAGE (EM TEMPO REAL)      */}
+      {/* ======================================================== */}
+      <Dialog
+        open={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: "#090d16",
+            color: "white",
+            borderRadius: 3,
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            overflow: "hidden",
+            maxHeight: "92vh",
+          },
+        }}
+      >
+        {/* Barra Superior do Preview */}
+        <div className="flex items-center justify-between px-6 py-3 bg-slate-900/90 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
+          <div className="flex items-center gap-3">
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Pré-visualização em Tempo Real</span>
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {landingTemplate}
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Os dados atualizam dinamicamente conforme você preenche o formulário.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Alternador Desktop / Mobile */}
+            <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+              <button
+                type="button"
+                onClick={() => setPreviewViewport("desktop")}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  previewViewport === "desktop"
+                    ? "bg-purple-600 text-white shadow-xs"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <span>💻</span>
+                <span>Desktop</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewViewport("mobile")}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  previewViewport === "mobile"
+                    ? "bg-purple-600 text-white shadow-xs"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <span>📱</span>
+                <span>Mobile</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setPreviewModalOpen(false)}
+              className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Área de Renderização do Template */}
+        <div className="p-4 bg-slate-950 overflow-y-auto max-h-[82vh] flex justify-center">
+          {previewViewport === "desktop" ? (
+            <div className="w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+              <TemplateRenderer
+                template={landingTemplate}
+                event={previewEventData}
+                primaryColor={primaryColor}
+                ctaText={ctaText}
+              />
+            </div>
+          ) : (
+            <div className="w-[375px] my-4 rounded-[40px] border-[10px] border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative">
+              {/* Notch / Barra Superior do Celular */}
+              <div className="h-6 bg-slate-900 flex items-center justify-between px-6 text-[10px] text-slate-400 select-none">
+                <span>9:41</span>
+                <div className="w-16 h-3 bg-black rounded-full" />
+                <span>5G 100%</span>
+              </div>
+              <div className="max-h-[640px] overflow-y-auto">
+                <TemplateRenderer
+                  template={landingTemplate}
+                  event={previewEventData}
+                  primaryColor={primaryColor}
+                  ctaText={ctaText}
+                />
+              </div>
+              {/* Home Indicator */}
+              <div className="h-4 bg-slate-900 flex items-center justify-center">
+                <div className="w-28 h-1 bg-slate-600 rounded-full" />
+              </div>
+            </div>
+          )}
+        </div>
       </Dialog>
 
       {/* ======================================================== */}
