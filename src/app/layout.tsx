@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Login",
-  description: "Aprendendo Login com Next.js",
+  title: "ONG Manager",
+  description: "Plataforma de gestão para ONGs com gerenciamento de membros, tarefas, finanças e eventos em um ambiente seguro e intuitivo.",
+  keywords: ["ONG Manager", "Gestão de ONGs", "Gerenciamento de ONGs", "ONG", "Gestão", "Gerenciamento", "Finanças", "Eventos", "Membros", "Tarefas", "Voluntários", "Doações", "ONGManager", "ONGManager Front"]
 };
 
 export default function RootLayout({
