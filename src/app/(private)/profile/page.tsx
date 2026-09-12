@@ -6,11 +6,13 @@ import { getMeApi, updateProfileApi } from "@/src/services/authService";
 import { getOngApi } from "@/src/services/ongService";
 import LoadingScreen from "@/src/components/LoadingScreen";
 import editProfileIcon from "../../../assets/editprofile.svg";
+import { toast } from "sonner";
 
 interface UserInfo {
   id: string;
   name: string;
   email: string;
+  phone?: string | null;
   role: string;
 }
 
@@ -42,6 +44,7 @@ export default function Profile() {
             ...prev,
             name: loadedUser.name || "",
             email: loadedUser.email || "",
+            phone: loadedUser.phone || "",
             role: loadedUser.role || "",
           }));
         }
@@ -52,7 +55,8 @@ export default function Profile() {
           setFormData((prev) => ({
             ...prev,
             ongName: ongData.name || "",
-            cnpj: ongData.description || "",
+            cnpj: ongData.cnpj || "",
+            role: ongData.userRole || loadedUser?.role || "",
           }));
         }
       } catch (err) {
@@ -65,6 +69,18 @@ export default function Profile() {
     loadProfile();
   }, []);
 
+  const formatPhone = (val: string) => {
+    const numbers = val.replace(/\D/g, "").slice(0, 11);
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, phone: formatPhone(e.target.value) }));
+  };
+
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -75,6 +91,7 @@ export default function Profile() {
         ...prev,
         name: user.name,
         email: user.email,
+        phone: user.phone || "",
         role: user.role,
         oldPassword: "",
         newPassword: "",
@@ -91,11 +108,13 @@ export default function Profile() {
       const payload: {
         name?: string;
         email?: string;
+        phone?: string;
         oldPassword?: string;
         newPassword?: string;
       } = {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone || undefined,
       };
 
       if (formData.oldPassword && formData.newPassword) {
@@ -105,21 +124,37 @@ export default function Profile() {
 
       const updatedUser = await updateProfileApi(payload);
       setUser(updatedUser);
+      toast.success("Perfil atualizado com sucesso!");
       setStatusMessage("Perfil atualizado com sucesso.");
       setFormData((prev) => ({
         ...prev,
         name: updatedUser.name,
         email: updatedUser.email,
+        phone: updatedUser.phone || "",
         role: updatedUser.role,
         oldPassword: "",
         newPassword: "",
       }));
     } catch (error) {
-      setStatusMessage(
-        error instanceof Error ? error.message : "Erro ao salvar o perfil.",
-      );
+      const msg = error instanceof Error ? error.message : "Erro ao salvar o perfil.";
+      toast.error(msg);
+      setStatusMessage(msg);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "Administrador";
+      case "finance_manager":
+        return "Gestor Financeiro";
+      case "member":
+      case "colaborador":
+        return "Voluntário";
+      default:
+        return role || "Membro";
     }
   };
 
@@ -128,12 +163,12 @@ export default function Profile() {
   }
 
   return (
-    <div className="p-1 md:p-4">
+    <div className="p-1 md:p-4 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text)]">Perfil do Usuário</h1>
           <p className="text-sm text-[var(--muted)] mt-1">
-            Atualize seus dados pessoais e senha em um só lugar.
+            Atualize seus dados pessoais, contato e senha em um só lugar.
           </p>
         </div>
         <div className="flex gap-3">
@@ -151,7 +186,7 @@ export default function Profile() {
             className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors ${
               saving
                 ? "bg-[var(--accent-muted)] cursor-not-allowed"
-                : "bg-[var(--accent)] hover:bg-[var(--accent-hover)] cursor-pointer"
+                : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
             }`}
           >
             {saving ? "Salvando..." : "Salvar Alterações"}
@@ -166,17 +201,22 @@ export default function Profile() {
       ) : null}
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6">
-        <div className="flex-1 bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-lg p-6">
+        <div className="flex-1 bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-xl p-6 shadow-xs">
           <div className="flex items-center gap-3 pb-6 border-b border-[var(--surface-border)] mb-6">
             <Image src={editProfileIcon} alt="Editar Perfil" width={28} height={28} />
             <h2 className="text-[var(--text)] font-bold text-xl md:text-2xl">Dados Pessoais</h2>
           </div>
 
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="hidden md:flex bg-[var(--bg)] border-2 border-[var(--surface-border)] rounded-md w-36 h-36 shrink-0 items-center justify-center text-[var(--muted)]">
-              <svg className="w-12 h-12 opacity-30" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
+            <div className="hidden md:flex bg-[var(--bg)] border-2 border-[var(--surface-border)] rounded-xl w-36 h-36 shrink-0 items-center justify-center text-purple-600 font-bold text-3xl">
+              {formData.name
+                ? formData.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()
+                : "U"}
             </div>
 
             <div className="flex-1">
@@ -200,49 +240,56 @@ export default function Profile() {
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Senha Atual</span>
+                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Telefone / WhatsApp</span>
                   <input
-                    type="password"
-                    value={formData.oldPassword}
-                    onChange={(e) => handleFormChange("oldPassword", e.target.value)}
-                    placeholder="Digite sua senha atual"
+                    type="tel"
+                    placeholder="(00) 00000-0000"
+                    value={formData.phone}
+                    onChange={handlePhoneChange}
                     className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Nova Senha</span>
-                  <input
-                    type="password"
-                    value={formData.newPassword}
-                    onChange={(e) => handleFormChange("newPassword", e.target.value)}
-                    placeholder="Digite a nova senha"
-                    className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
-                  />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Cargo</span>
+                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Cargo na ONG</span>
                   <input
                     type="text"
-                    value={formData.role}
-                    onChange={(e) => handleFormChange("role", e.target.value)}
-                    className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                    value={getRoleLabel(formData.role)}
+                    readOnly
+                    disabled
+                    className="w-full max-w-[384px] h-10 bg-[var(--surface-hover)] text-[var(--muted)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 cursor-not-allowed opacity-80"
                   />
                 </div>
-                <div>
-                  <span className="text-sm font-medium text-[var(--text)] block mb-1">Link de Convite</span>
-                  <input
-                    type="url"
-                    className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
-                    placeholder="Em breve"
-                    disabled
-                  />
+                <div className="pt-2 border-t border-[var(--surface-border)]">
+                  <span className="text-sm font-semibold text-[var(--text)] block mb-2">Alterar Senha</span>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs text-[var(--muted)] block mb-1">Senha Atual</span>
+                      <input
+                        type="password"
+                        value={formData.oldPassword}
+                        onChange={(e) => handleFormChange("oldPassword", e.target.value)}
+                        placeholder="Digite sua senha atual"
+                        className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs text-[var(--muted)] block mb-1">Nova Senha</span>
+                      <input
+                        type="password"
+                        value={formData.newPassword}
+                        onChange={(e) => handleFormChange("newPassword", e.target.value)}
+                        placeholder="Digite a nova senha"
+                        className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-lg p-6 lg:w-[400px] shrink-0 h-fit">
+        <div className="bg-[var(--card)] border-2 border-[var(--surface-border)] rounded-xl p-6 lg:w-[400px] shrink-0 h-fit shadow-xs">
           <div className="pb-6 border-b border-[var(--surface-border)] mb-6">
             <h2 className="text-[var(--text)] font-bold text-xl md:text-2xl">Instituição</h2>
           </div>
@@ -252,17 +299,19 @@ export default function Profile() {
               <input
                 type="text"
                 value={formData.ongName}
-                onChange={(e) => handleFormChange("ongName", e.target.value)}
-                className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                readOnly
+                disabled
+                className="w-full max-w-[384px] h-10 bg-[var(--surface-hover)] text-[var(--muted)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 cursor-not-allowed opacity-80"
               />
             </div>
             <div>
-              <span className="text-sm font-medium text-[var(--text)] block mb-1">CNPJ</span>
+              <span className="text-sm font-medium text-[var(--text)] block mb-1">CNPJ da ONG</span>
               <input
                 type="text"
                 value={formData.cnpj}
-                onChange={(e) => handleFormChange("cnpj", e.target.value)}
-                className="w-full max-w-[384px] h-10 bg-[var(--input)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--input-ring)] focus:border-transparent hover:border-[var(--input-hover)] transition-colors"
+                readOnly
+                disabled
+                className="w-full max-w-[384px] h-10 bg-[var(--surface-hover)] text-[var(--muted)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 cursor-not-allowed opacity-80"
               />
             </div>
           </div>

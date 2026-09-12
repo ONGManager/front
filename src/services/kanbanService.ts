@@ -52,8 +52,8 @@ export async function createKanbanTaskApi(
     title: string;
     description?: string;
     priority?: string;
-    deadline?: string;
-    assignedToId?: string;
+    deadline?: string | null;
+    assignedToId?: string | null;
   },
 ): Promise<KanbanTask> {
   try {
@@ -83,8 +83,8 @@ export async function updateKanbanTaskApi(
     description: string;
     priority: string;
     status: string;
-    deadline: string;
-    assignedToId: string;
+    deadline: string | null;
+    assignedToId: string | null;
   }>,
 ): Promise<KanbanTask> {
   try {

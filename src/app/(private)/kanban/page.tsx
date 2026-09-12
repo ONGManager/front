@@ -160,8 +160,8 @@ export default function KanbanPage() {
           title,
           description,
           priority,
-          deadline: deadline ? new Date(deadline).toISOString() : undefined,
-          assignedToId: assignedToId || undefined,
+          deadline: deadline ? new Date(deadline).toISOString() : null,
+          assignedToId: assignedToId ? assignedToId : null,
         };
         console.log("[KANBAN_FORM][UPDATE] payload:", payload);
         console.log("[KANBAN_FORM][UPDATE] payload typeof:", typeof payload);
@@ -176,8 +176,8 @@ export default function KanbanPage() {
           title,
           description,
           priority,
-          deadline: deadline ? new Date(deadline).toISOString() : undefined,
-          assignedToId: assignedToId || undefined,
+          deadline: deadline ? new Date(deadline).toISOString() : null,
+          assignedToId: assignedToId ? assignedToId : null,
         };
         console.log("[KANBAN_FORM][CREATE] payload:", payload);
         console.log("[KANBAN_FORM][CREATE] payload typeof:", typeof payload);
@@ -545,7 +545,7 @@ export default function KanbanPage() {
                   },
                 }}
               >
-                <MenuItem value="">Ninguêm</MenuItem>
+                <MenuItem value="">Ninguém</MenuItem>
                 {members.map((m) => (
                   <MenuItem key={m.user.id} value={m.user.id}>
                     {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"}

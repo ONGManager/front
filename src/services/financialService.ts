@@ -105,4 +105,20 @@ export const financialService = {
     const response = await api.delete(`/ong/${ongId}/financial/${id}`);
     return response.data as { message: string };
   },
+
+  async exportReport(
+    ongId: string,
+    format: "csv" | "pdf",
+    filter?: FinancialListFilters,
+  ): Promise<Blob> {
+    const response = await api.get(`/ong/${ongId}/financial/export`, {
+      params: {
+        format,
+        ...filter,
+      },
+      responseType: "blob",
+    });
+    return response.data as Blob;
+  },
 };
+

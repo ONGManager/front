@@ -9,10 +9,20 @@ export async function loginApi(email: string, password: string) {
   }
 }
 
+export async function sendVerificationCodeApi(email: string, ongName?: string): Promise<{ message: string; expiresInSeconds: number }> {
+  try {
+    const { data } = await api.post("/auth/send-verification-code", { email, ongName });
+    return data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Erro ao enviar código de verificação"));
+  }
+}
+
 export async function registerApi(
   name: string,
   email: string,
   password: string,
+  code: string,
   ongName?: string,
   ongCnpj?: string,
 ) {
@@ -21,6 +31,7 @@ export async function registerApi(
       name,
       email,
       password,
+      code,
       ongName,
       ongCnpj,
     });
@@ -47,6 +58,7 @@ export async function logoutApi() {
 export async function updateProfileApi(data: {
   name?: string;
   email?: string;
+  phone?: string;
   oldPassword?: string;
   newPassword?: string;
 }) {
@@ -55,5 +67,26 @@ export async function updateProfileApi(data: {
     return response;
   } catch (error) {
     throw new Error(getApiErrorMessage(error, "Erro ao atualizar perfil"));
+  }
+}
+
+export async function forgotPasswordApi(email: string): Promise<{ message: string }> {
+  try {
+    const { data } = await api.post<{ message: string }>("/auth/forgot-password", { email });
+    return data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Erro ao solicitar recuperação de senha"));
+  }
+}
+
+export async function resetPasswordApi(token: string, newPassword: string): Promise<{ message: string }> {
+  try {
+    const { data } = await api.post<{ message: string }>("/auth/reset-password", {
+      token,
+      newPassword,
+    });
+    return data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Erro ao redefinir senha"));
   }
 }

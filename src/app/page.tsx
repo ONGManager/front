@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@mui/material";
 import LoginPadrao from "../components/Login";
 import LoadingScreen from "@/src/components/LoadingScreen";
 import { loginApi, getMeApi } from "../services/authService";
 import { toast } from "sonner";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +24,7 @@ export default function Home() {
       try {
         const user = await getMeApi();
         if (user) {
-          router.push("/OngSelector");
+          router.push(redirectUrl || "/OngSelector");
         }
       } catch {
         // Not logged in, stay on login page
@@ -30,7 +33,7 @@ export default function Home() {
       }
     }
     checkAuth();
-  }, [router]);
+  }, [router, redirectUrl]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +42,7 @@ export default function Home() {
     try {
       await loginApi(email, password);
       toast.success("Login realizado com sucesso!");
-      router.push("/OngSelector");
+      router.push(redirectUrl || "/OngSelector");
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "E-mail ou senha inválidos.",
@@ -145,7 +148,7 @@ export default function Home() {
         <div className="flex flex-wrap items-center justify-center gap-1 mt-2">
           <p className="SubTitulo mb-0!">Ainda não tem uma conta?</p>
           <a
-            href="/register"
+            href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : "/register"}
             className="text-base md:text-xl text-[var(--accent)] font-bold hover:opacity-80"
           >
             Criar minha ONG
@@ -153,5 +156,13 @@ export default function Home() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<LoadingScreen text="Carregando..." />}>
+      <HomeContent />
+    </Suspense>
   );
 }

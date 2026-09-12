@@ -49,6 +49,9 @@ export default function Bill() {
   const [financialToDelete, setFinancialToDelete] = useState<Financial | null>(
     null,
   );
+  const [exportingFormat, setExportingFormat] = useState<"csv" | "pdf" | null>(
+    null,
+  );
   const [formData, setFormData] = useState({
     description: "",
     type: "despesa" as "receita" | "despesa",
@@ -278,11 +281,43 @@ export default function Bill() {
     setModalOpen(false);
   };
 
+  const handleExport = async (format: "csv" | "pdf") => {
+    if (!ongId) return;
+    try {
+      setExportingFormat(format);
+      const filter: any = {};
+      if (filterType !== "all") filter.type = filterType;
+      if (filterStatus !== "all") filter.status = filterStatus;
+
+      const blob = await financialService.exportReport(ongId, format, filter);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = `relatorio_financeiro_${new Date().toISOString().split("T")[0]}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+      toast.success(`Relatório ${format.toUpperCase()} baixado com sucesso!`);
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : `Erro ao exportar relatório em ${format.toUpperCase()}`,
+      );
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-[var(--text)]">Contas a Pagar</h1>
-      <p className="mt-2 text-[var(--text)]">
-        Aqui você pode gerenciar as contas da sua ONG.
+      <h1 className="text-2xl font-bold text-[var(--text)]">Financeiro</h1>
+      <p className="mt-1 text-sm text-[var(--muted)]">
+        Gerencie receitas, despesas, acompanhe o saldo em tempo real e exporte relatórios.
       </p>
 
       {/* Cards de Resumo */}
@@ -350,11 +385,52 @@ export default function Bill() {
             </select>
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            variant="outlined"
+            onClick={() => handleExport("csv")}
+            disabled={exportingFormat !== null}
+            className="border-[var(--surface-border)]! text-[var(--text)]! hover:bg-[var(--surface-hover)]! normal-case font-medium text-xs sm:text-sm py-1.5 px-3"
+            startIcon={
+              exportingFormat === "csv" ? (
+                <CircularProgress size={16} sx={{ color: "var(--text)" }} />
+              ) : (
+                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              )
+            }
+          >
+            {exportingFormat === "csv" ? "Exportando CSV..." : "Exportar CSV"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            onClick={() => handleExport("pdf")}
+            disabled={exportingFormat !== null}
+            className="border-[var(--surface-border)]! text-[var(--text)]! hover:bg-[var(--surface-hover)]! normal-case font-medium text-xs sm:text-sm py-1.5 px-3"
+            startIcon={
+              exportingFormat === "pdf" ? (
+                <CircularProgress size={16} sx={{ color: "var(--text)" }} />
+              ) : (
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              )
+            }
+          >
+            {exportingFormat === "pdf" ? "Exportando PDF..." : "Exportar PDF"}
+          </Button>
+
           <Button
             variant="contained"
             onClick={openCreateModal}
-            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer w-full md:w-auto"
+            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer normal-case font-medium text-xs sm:text-sm py-1.5 px-4"
+            startIcon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            }
           >
             Adicionar Conta
           </Button>

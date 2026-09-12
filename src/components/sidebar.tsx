@@ -12,15 +12,27 @@ interface SidebarProps {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", adminOnly: false },
   { href: "/kanban", label: "Tarefas", adminOnly: false },  
-  { href: "/bill", label: "Contas a Pagar", adminOnly: false },
+  { href: "/bill", label: "Financeiro", adminOnly: false },
   { href: "/events", label: "Eventos", adminOnly: false },
-  { href: "/members", label: "Voluntários", adminOnly: true },
+  { href: "/members", label: "Membros", adminOnly: true },
 ];
 
 export default function Sidebar({ userRole = "colaborador", isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isAdmin = userRole === "admin";
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "Administrador";
+      case "finance_manager":
+        return "Gestor Financeiro";
+      case "member":
+      default:
+        return "Voluntário";
+    }
+  };
 
   const handleLogout = async () => {
     await logoutApi();
