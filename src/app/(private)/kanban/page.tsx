@@ -4,16 +4,21 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  ConfirmModal,
+} from "@/src/components/Modal";
 import { toast } from "sonner";
 import {
   getKanbanTasksApi,
@@ -407,73 +412,73 @@ export default function KanbanPage() {
       </div>
 
       {/* Modal de criar/editar tarefa */}
-      <Dialog
+      <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 2,
-            border: "1px solid var(--surface-border)",
-            minHeight: 400,
-          },
-        }}
       >
-        <DialogTitle sx={{ color: "var(--text)"}}>
-          {editingTask ? "Editar Tarefa" : "Nova Tarefa"}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <div className="mt-2">
-            <div className="flex flex-col gap-5">
-            <TextField
-              label="Título"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              fullWidth
-              required
-              sx={{
-                "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "var(--text)",
-                },
-                "& .MuiOutlinedInput-root": {
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 1,
-                  minHeight: 48,
-                  "& fieldset": { borderColor: "var(--input-border)" },
-                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
-                },
-              }}
-            />
-            <TextField
-              label="Descrição"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-              multiline
-              rows={3}
-              sx={{
-                "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "var(--text)",
-                },
-                "& .MuiOutlinedInput-root": {
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 1,
-                  "& fieldset": { borderColor: "var(--input-border)" },
-                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
-                },
-              }}
-            />
-            <FormControl fullWidth sx={{ minHeight: 48 }}>
-              {/* <InputLabel sx={{ color: "var(--muted)" }}>Prioridade</InputLabel> */}
+        <ModalHeader
+          title={editingTask ? "Editar Tarefa" : "Nova Tarefa"}
+          subtitle={
+            editingTask
+              ? "Atualize as informações, prazos e responsáveis da tarefa."
+              : "Defina o escopo, prioridade e responsável para organizar o fluxo de trabalho."
+          }
+          iconVariant="purple"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          }
+          onClose={() => setModalOpen(false)}
+        />
+        <ModalBody className="space-y-4">
+          <TextField
+            label="Título da Tarefa *"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            fullWidth
+            required
+            placeholder="Ex: Elaborar relatório mensal de doações"
+            sx={{
+              "& .MuiInputLabel-root": { color: "var(--muted)" },
+              "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+              "& .MuiOutlinedInput-root": {
+                color: "var(--text)",
+                bgcolor: "var(--input)",
+                borderRadius: 2,
+                "& fieldset": { borderColor: "var(--input-border)" },
+                "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+              },
+            }}
+          />
+
+          <TextField
+            label="Descrição Detalhada"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            multiline
+            rows={3}
+            placeholder="Instruções, links ou critérios de entrega..."
+            sx={{
+              "& .MuiInputLabel-root": { color: "var(--muted)" },
+              "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
+              "& .MuiOutlinedInput-root": {
+                color: "var(--text)",
+                bgcolor: "var(--input)",
+                borderRadius: 2,
+                "& fieldset": { borderColor: "var(--input-border)" },
+                "&:hover fieldset": { borderColor: "var(--input-hover)" },
+                "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
+              },
+            }}
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: "var(--muted)" }}>Prioridade</InputLabel>
               <Select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
@@ -481,8 +486,7 @@ export default function KanbanPage() {
                 sx={{
                   color: "var(--text)",
                   bgcolor: "var(--input)",
-                  borderRadius: 1,
-                  minHeight: 48,
+                  borderRadius: 2,
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderColor: "var(--input-border)",
                   },
@@ -500,8 +504,9 @@ export default function KanbanPage() {
                 <MenuItem value="urgente">Urgente</MenuItem>
               </Select>
             </FormControl>
+
             <TextField
-              label="Prazo"
+              label="Prazo de Conclusão"
               type="date"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
@@ -509,156 +514,208 @@ export default function KanbanPage() {
               InputLabelProps={{ shrink: true }}
               sx={{
                 "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "var(--text)",
-                },
+                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
                 "& .MuiOutlinedInput-root": {
                   color: "var(--text)",
                   bgcolor: "var(--input)",
-                  borderRadius: 1,
-                  minHeight: 78,
+                  borderRadius: 2,
                   "& fieldset": { borderColor: "var(--input-border)" },
                   "&:hover fieldset": { borderColor: "var(--input-hover)" },
                   "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
                 },
               }}
             />
-            <FormControl fullWidth sx={{ minHeight: 48 }}>
-              <InputLabel sx={{ color: "var(--muted)" }}>Atribuir para</InputLabel>
-              <Select
-                value={assignedToId}
-                onChange={(e) => setAssignedToId(e.target.value)}
-                label="Atribuir para"
-                sx={{
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 1,
-                  minHeight: 48,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--input-border)",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--input-hover)",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--input-ring)",
-                  },
-                }}
-              >
-                <MenuItem value="">Ninguém</MenuItem>
-                {members.map((m) => (
-                  <MenuItem key={m.user.id} value={m.user.id}>
-                    {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"}
-                    )
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            </div>
           </div>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-          onClick={() => setModalOpen(false)
-          }
-          className="!text-white text-sm font-medium px-4 rounded-sm !hover:bg-red-700 bg-red-600! hover:bg-red-700!"
-          >Cancelar</Button>
-          <Button 
-            onClick={handleSubmit}
-            variant="contained"
-            className="text-white text-sm font-medium px-4 rounded-sm bg-green-600! hover:bg-green-700!"
-          >
-            {editingTask ? "Salvar" : "Criar"}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
-      <Dialog
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: "var(--muted)" }}>Responsável pela Tarefa</InputLabel>
+            <Select
+              value={assignedToId}
+              onChange={(e) => setAssignedToId(e.target.value)}
+              label="Responsável pela Tarefa"
+              sx={{
+                color: "var(--text)",
+                bgcolor: "var(--input)",
+                borderRadius: 2,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "var(--input-border)",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "var(--input-hover)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "var(--input-ring)",
+                },
+              }}
+            >
+              <MenuItem value="">Ninguém (Não atribuído)</MenuItem>
+              {members.map((m) => (
+                <MenuItem key={m.user.id} value={m.user.id}>
+                  {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            type="button"
+            variant="secondary"
+            onClick={() => setModalOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Cancelar
+          </ModalButton>
+          <ModalButton
+            type="button"
+            variant="primary"
+            onClick={handleSubmit}
+            className="w-full sm:w-auto"
+          >
+            {editingTask ? "Salvar Alterações" : "Criar Tarefa"}
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
+
+      {/* Modal de Detalhes da Tarefa */}
+      <Modal
         open={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}
         maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 2,
-            border: "1px solid var(--surface-border)",
-          },
-        }}
       >
-        <DialogTitle sx={{ color: "var(--text)" }}>Detalhes da Tarefa</DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
+        <ModalHeader
+          title="Detalhes da Tarefa"
+          subtitle={selectedTaskDetails ? selectedTaskDetails.title : "Informações completas e histórico"}
+          iconVariant="blue"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+          onClose={() => setDetailsModalOpen(false)}
+        />
+        <ModalBody className="space-y-5">
           {detailsLoading ? (
-            <p>Carregando detalhes...</p>
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <CircularProgress size={28} sx={{ color: "var(--accent)" }} />
+              <span className="text-sm font-medium text-[var(--muted)]">Carregando detalhes da tarefa...</span>
+            </div>
           ) : selectedTaskDetails ? (
-            <div className="space-y-4 mt-2">
-              <div>
-                <h3 className="font-semibold text-lg text-[var(--text)]">
+            <div className="space-y-5">
+              {/* Título e Descrição */}
+              <div className="p-4 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                <h4 className="font-bold text-lg text-[var(--text)]">
                   {selectedTaskDetails.title}
-                </h3>
-                {selectedTaskDetails.description && (
-                  <p className="text-sm text-[var(--muted)] mt-1">
+                </h4>
+                {selectedTaskDetails.description ? (
+                  <p className="text-sm text-[var(--muted)] mt-2 leading-relaxed whitespace-pre-line">
                     {selectedTaskDetails.description}
+                  </p>
+                ) : (
+                  <p className="text-xs italic text-[var(--muted)]/70 mt-1">
+                    Sem descrição detalhada.
                   </p>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {statusLabels[selectedTaskDetails.status]}
-                </p>
-                <p>
-                  <strong>Prioridade:</strong>{" "}
-                  {priorityLabels[selectedTaskDetails.priority]}
-                </p>
-                <p>
-                  <strong>Prazo:</strong>{" "}
-                  {selectedTaskDetails.deadline
-                    ? new Date(selectedTaskDetails.deadline).toLocaleDateString(
-                        "pt-BR",
-                      )
-                    : "Sem prazo"}
-                </p>
-                <p>
-                  <strong>Responsável:</strong>{" "}
-                  {selectedTaskDetails.assignedTo?.name || "Não atribuído"}
-                </p>
+              {/* Cards de Métricas / Status */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                <div className="p-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                    Status
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${
+                      selectedTaskDetails.status === "concluido"
+                        ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+                        : selectedTaskDetails.status === "em_andamento"
+                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300"
+                        : selectedTaskDetails.status === "aguardando_aprovacao"
+                        ? "bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    {statusLabels[selectedTaskDetails.status] || selectedTaskDetails.status}
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                    Prioridade
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${
+                      selectedTaskDetails.priority === "urgente"
+                        ? "bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300"
+                        : selectedTaskDetails.priority === "alta"
+                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300"
+                        : selectedTaskDetails.priority === "media"
+                        ? "bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300"
+                        : "bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300"
+                    }`}
+                  >
+                    {priorityLabels[selectedTaskDetails.priority] || selectedTaskDetails.priority}
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                    Prazo
+                  </span>
+                  <span className="font-semibold text-xs text-[var(--text)]">
+                    {selectedTaskDetails.deadline
+                      ? new Date(selectedTaskDetails.deadline).toLocaleDateString("pt-BR")
+                      : "Sem prazo"}
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                    Responsável
+                  </span>
+                  <span className="font-semibold text-xs text-[var(--text)] truncate block">
+                    {selectedTaskDetails.assignedTo?.name || "Não atribuído"}
+                  </span>
+                </div>
               </div>
 
+              {/* Histórico */}
               <div>
-                <h4 className="font-semibold text-[var(--text)] mb-2">
-                  Histórico
-                </h4>
+                <h5 className="font-bold text-sm text-[var(--text)] mb-2.5 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Histórico de Alterações
+                </h5>
                 {selectedTaskDetails.history.length === 0 ? (
-                  <p className="text-sm text-[var(--muted)]">Sem histórico.</p>
+                  <p className="text-xs text-[var(--muted)] italic p-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
+                    Nenhuma alteração registrada até o momento.
+                  </p>
                 ) : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                     {selectedTaskDetails.history.map((item) => (
                       <div
                         key={item.id}
-                        className="border border-[var(--surface-border)] rounded p-2 text-sm bg-[var(--surface-hover)]"
+                        className="border border-[var(--surface-border)] rounded-xl p-3 text-xs bg-[var(--surface-hover)] space-y-1"
                       >
-                        <p>
-                          <strong>Ação:</strong>{" "}
-                          {historyActionLabels[item.action] || item.action}
-                        </p>
-                        <p>
-                          <strong>Por:</strong> {item.actor?.name || "Sistema"}
-                        </p>
-                        <p>
-                          <strong>De:</strong>{" "}
-                          {item.previousStatus
-                            ? statusLabels[item.previousStatus]
-                            : "-"}
-                        </p>
-                        <p>
-                          <strong>Para:</strong>{" "}
-                          {item.newStatus ? statusLabels[item.newStatus] : "-"}
-                        </p>
-                        <p className="text-xs text-[var(--muted)] mt-1">
-                          {new Date(item.createdAt).toLocaleString("pt-BR")}
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[var(--text)]">
+                            {historyActionLabels[item.action] || item.action}
+                          </span>
+                          <span className="text-[10px] text-[var(--muted)]">
+                            {new Date(item.createdAt).toLocaleString("pt-BR")}
+                          </span>
+                        </div>
+                        <p className="text-[var(--muted)]">
+                          Por: <strong className="text-[var(--text)]">{item.actor?.name || "Sistema"}</strong>
+                          {item.previousStatus && item.newStatus ? (
+                            <>
+                              {" "}• De{" "}
+                              <span className="font-medium text-[var(--text)]">{statusLabels[item.previousStatus] || item.previousStatus}</span>
+                              {" "}para{" "}
+                              <span className="font-medium text-[var(--text)]">{statusLabels[item.newStatus] || item.newStatus}</span>
+                            </>
+                          ) : null}
                         </p>
                       </div>
                     ))}
@@ -667,54 +724,33 @@ export default function KanbanPage() {
               </div>
             </div>
           ) : (
-            <p>Nenhum detalhe encontrado.</p>
+            <p className="text-sm text-[var(--muted)] text-center py-6">Nenhum detalhe encontrado.</p>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDetailsModalOpen(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            variant="secondary"
+            onClick={() => setDetailsModalOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Fechar
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
 
       {/* Modal de Excluir Tarefa */}
-      <Dialog
+      <ConfirmModal
         open={deleteDialogOpen}
         onClose={() => !deleting && setDeleteDialogOpen(false)}
-        disableEscapeKeyDown={deleting}
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 2,
-            border: "1px solid var(--surface-border)",
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: "var(--text)" }}>Excluir tarefa</DialogTitle>
-        <DialogContent>
-          <p className="text-[var(--text)]">
-            Tem certeza que deseja excluir essa tarefa? Essa ação não pode ser desfeita.
-          </p>
-          {taskToDelete ? (
-            <p className="mt-3 text-sm text-[var(--muted)] font-semibold">
-              {taskToDelete.title}
-            </p>
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting} className="text-purple-600!">
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDelete}
-            color="error"
-            variant="contained"
-            disabled={deleting}
-            className="bg-red-600! hover:bg-red-700! text-white cursor-pointer"
-          >
-            {deleting ? "Excluindo..." : "Excluir"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleDelete}
+        title="Excluir Tarefa"
+        description="Tem certeza que deseja excluir essa tarefa? Essa ação não pode ser desfeita e removerá o histórico registrado."
+        itemName={taskToDelete?.title}
+        confirmText="Excluir Tarefa"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   );
 }

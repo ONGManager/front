@@ -5,14 +5,19 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   MenuItem,
   CircularProgress,
   Tooltip,
 } from "@mui/material";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  ConfirmModal,
+} from "@/src/components/Modal";
 import { toast } from "sonner";
 import {
   getEventsApi,
@@ -42,6 +47,15 @@ function MobileDeviceFrame({ children }: { children: React.ReactNode }) {
   const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
 
+  // Dimensões fixas do frame do celular
+  const PHONE_WIDTH = 300;       // largura total (inclui border)
+  const VIEWPORT_HEIGHT = 520;   // área visível do conteúdo
+  const NOTCH_HEIGHT = 28;       // status bar
+  const HOME_HEIGHT = 18;        // home indicator
+  const BORDER = 8;              // borda do device
+  // Altura total: BORDER + NOTCH + VIEWPORT + HOME + BORDER = 8+28+520+18+8 = 582px (fixo, nunca muda)
+  const TOTAL_HEIGHT = BORDER * 2 + NOTCH_HEIGHT + VIEWPORT_HEIGHT + HOME_HEIGHT;
+
   useEffect(() => {
     if (!iframeRef) return;
     const doc = iframeRef.contentDocument || iframeRef.contentWindow?.document;
@@ -62,15 +76,16 @@ function MobileDeviceFrame({ children }: { children: React.ReactNode }) {
               width: 100%;
               min-height: 100%;
               overflow-x: hidden;
+              overflow-y: auto;
               background-color: #020617;
               -webkit-font-smoothing: antialiased;
             }
-            ::-webkit-scrollbar {
-              width: 4px;
-            }
-            ::-webkit-scrollbar-thumb {
-              background: rgba(255, 255, 255, 0.2);
-              border-radius: 4px;
+            /* Scrollbar invisível mas funcional (scroll como celular real) */
+            ::-webkit-scrollbar { width: 0; height: 0; display: none; }
+            * { scrollbar-width: none; -ms-overflow-style: none; }
+            #mobile-preview-root {
+              width: 100%;
+              min-height: 100%;
             }
           </style>
         </head>
@@ -106,16 +121,32 @@ function MobileDeviceFrame({ children }: { children: React.ReactNode }) {
   }, [iframeRef]);
 
   return (
-    <div className="w-[375px] my-2 rounded-[44px] border-[10px] border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative flex flex-col items-center shrink-0">
+    <div
+      className="rounded-[40px] border-slate-800 bg-slate-950 overflow-hidden shadow-2xl relative flex flex-col items-center shrink-0"
+      style={{
+        width: PHONE_WIDTH,
+        height: TOTAL_HEIGHT,
+        maxWidth: PHONE_WIDTH,
+        maxHeight: TOTAL_HEIGHT,
+        borderWidth: BORDER,
+        borderStyle: "solid",
+      }}
+    >
       {/* Notch e Status Bar */}
-      <div className="w-full h-7 bg-slate-900 flex items-center justify-between px-6 text-[10px] text-slate-400 select-none z-20 shrink-0">
+      <div
+        className="w-full bg-slate-900 flex items-center justify-between px-5 text-[10px] text-slate-400 select-none shrink-0"
+        style={{ height: NOTCH_HEIGHT }}
+      >
         <span className="font-semibold">9:41</span>
-        <div className="w-20 h-3.5 bg-black rounded-full" />
+        <div className="w-16 h-3 bg-black rounded-full" />
         <span className="font-mono">5G 100%</span>
       </div>
 
-      {/* Viewport de 355px real interna */}
-      <div className="w-full h-[640px] relative overflow-hidden bg-slate-950">
+      {/* Viewport — tamanho fixo, scroll interno via iframe */}
+      <div
+        className="w-full relative overflow-hidden bg-slate-950 flex-1"
+        style={{ height: VIEWPORT_HEIGHT, maxHeight: VIEWPORT_HEIGHT }}
+      >
         <iframe
           ref={setIframeRef}
           title="Pré-visualização Mobile Real"
@@ -125,8 +156,11 @@ function MobileDeviceFrame({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Barra Inferior (Home Indicator) */}
-      <div className="w-full h-5 bg-slate-900 flex items-center justify-center shrink-0 z-20">
-        <div className="w-32 h-1 bg-slate-600 rounded-full" />
+      <div
+        className="w-full bg-slate-900 flex items-center justify-center shrink-0"
+        style={{ height: HOME_HEIGHT }}
+      >
+        <div className="w-24 h-1 bg-slate-600 rounded-full" />
       </div>
     </div>
   );
@@ -871,25 +905,25 @@ export default function EventsPage() {
       {/* ======================================================== */}
       {/* MODAL: CRIAR OU EDITAR EVENTO                             */}
       {/* ======================================================== */}
-      <Dialog
+      <Modal
         open={eventModalOpen}
         onClose={() => !submittingEvent && setEventModalOpen(false)}
         maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--surface-border)",
-            p: 1,
-          },
-        }}
+        preventClose={submittingEvent}
       >
-        <DialogTitle sx={{ color: "var(--text)", fontWeight: 700 }}>
-          {editingEventId ? "Editar Evento" : "Cadastrar Novo Evento"}
-        </DialogTitle>
-        <DialogContent>
+        <ModalHeader
+          title={editingEventId ? "Editar Evento" : "Cadastrar Novo Evento"}
+          subtitle="Configure as informações do evento, regras de inscrições e página pública."
+          iconVariant="purple"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          }
+          onClose={() => setEventModalOpen(false)}
+          closeDisabled={submittingEvent}
+        />
+        <ModalBody>
           <div className="space-y-4 mt-2">
             <TextField
               label="Título do Evento *"
@@ -1170,32 +1204,28 @@ export default function EventsPage() {
               )}
             </div>
           </div>
-        </DialogContent>
-        <DialogActions className="gap-2 px-6 pb-4">
-          <button
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
             type="button"
+            variant="secondary"
             onClick={() => setEventModalOpen(false)}
             disabled={submittingEvent}
-            className="px-4 py-2 text-xs font-semibold rounded-xl text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors cursor-pointer"
+            className="w-full sm:w-auto"
           >
             Cancelar
-          </button>
-          <button
+          </ModalButton>
+          <ModalButton
             type="button"
+            variant="primary"
             onClick={handleSaveEvent}
-            disabled={submittingEvent}
-            className="px-5 py-2.5 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+            loading={submittingEvent}
+            className="w-full sm:w-auto"
           >
-            {submittingEvent ? (
-              <CircularProgress size={16} sx={{ color: "white" }} />
-            ) : editingEventId ? (
-              "Salvar Alterações"
-            ) : (
-              "Criar Evento"
-            )}
-          </button>
-        </DialogActions>
-      </Dialog>
+            {editingEventId ? "Salvar Alterações" : "Criar Evento"}
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
 
       {/* ======================================================== */}
       {/* MODAL: LIVE PREVIEW DA LANDING PAGE (EM TEMPO REAL)      */}
@@ -1205,38 +1235,54 @@ export default function EventsPage() {
         onClose={() => setPreviewModalOpen(false)}
         maxWidth="lg"
         fullWidth
+        disableScrollLock={false}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: "rgba(0,0,0,0.75)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            },
+          },
+        }}
         PaperProps={{
           sx: {
             bgcolor: "#090d16",
             color: "white",
-            borderRadius: 3,
+            borderRadius: { xs: 2, sm: 3 },
             border: "1px solid rgba(255, 255, 255, 0.1)",
             overflow: "hidden",
-            maxHeight: "92vh",
+            display: "flex",
+            flexDirection: "column",
+            /* Use svh so that on mobile the dialog fits the visible viewport */
+            maxHeight: { xs: "calc(100svh - 32px)", sm: "92svh" },
+            height: { xs: "calc(100svh - 32px)", sm: "92svh" },
+            margin: { xs: 2, sm: 3 },
+            backgroundImage: "none",
           },
         }}
       >
-        {/* Barra Superior do Preview */}
-        <div className="flex items-center justify-between px-6 py-3 bg-slate-900/90 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
-          <div className="flex items-center gap-3">
-            <span className="flex h-2.5 w-2.5 relative">
+        {/* Barra Superior do Preview — parte do flex, não rola */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-slate-900/95 border-b border-white/10 backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="flex h-2.5 w-2.5 relative shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-white flex flex-wrap items-center gap-2">
                 <span>Pré-visualização em Tempo Real</span>
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
                   {landingTemplate}
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-400 hidden sm:block">
                 Os dados atualizam dinamicamente conforme você preenche o formulário.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Alternador Desktop / Mobile */}
             <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
               <button
@@ -1249,7 +1295,7 @@ export default function EventsPage() {
                 }`}
               >
                 <span>💻</span>
-                <span>Desktop</span>
+                <span className="hidden xs:inline">Desktop</span>
               </button>
               <button
                 type="button"
@@ -1261,24 +1307,24 @@ export default function EventsPage() {
                 }`}
               >
                 <span>📱</span>
-                <span>Mobile</span>
+                <span className="hidden xs:inline">Mobile</span>
               </button>
             </div>
 
             <button
               type="button"
               onClick={() => setPreviewModalOpen(false)}
-              className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
             >
               ✕
             </button>
           </div>
         </div>
 
-        {/* Área de Renderização do Template */}
-        <div className="p-4 bg-slate-950 overflow-y-auto max-h-[82vh] flex justify-center">
+        {/* Área de Renderização do Template — cresce e rola internamente */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-slate-950 flex justify-center p-4">
           {previewViewport === "desktop" ? (
-            <div className="w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+            <div className="w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl self-start">
               <TemplateRenderer
                 template={landingTemplate}
                 event={previewEventData}
@@ -1302,32 +1348,22 @@ export default function EventsPage() {
       {/* ======================================================== */}
       {/* MODAL: GESTÃO DE CONVIDADOS / INSCRITOS                   */}
       {/* ======================================================== */}
-      <Dialog
+      <Modal
         open={guestsModalOpen}
         onClose={() => setGuestsModalOpen(false)}
         maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--surface-border)",
-            p: 1,
-          },
-        }}
       >
-        <DialogTitle>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--surface-border)] pb-3">
-            <div>
-              <h2 className="text-xl font-bold text-[var(--text)]">
-                Inscritos no Evento
-              </h2>
-              <p className="text-xs text-[var(--muted)] mt-0.5 font-medium">
-                {selectedEventForGuests?.title}
-              </p>
-            </div>
-
+        <ModalHeader
+          title="Inscritos no Evento"
+          subtitle={selectedEventForGuests?.title}
+          iconVariant="purple"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          }
+          onClose={() => setGuestsModalOpen(false)}
+          actions={
             <div className="flex items-center gap-2">
               {selectedEventForGuests && (
                 <button
@@ -1338,7 +1374,7 @@ export default function EventsPage() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                   </svg>
-                  <span>Copiar Convite</span>
+                  <span className="hidden sm:inline">Copiar Convite</span>
                 </button>
               )}
 
@@ -1354,10 +1390,10 @@ export default function EventsPage() {
                 <span>Exportar CSV</span>
               </button>
             </div>
-          </div>
-        </DialogTitle>
+          }
+        />
 
-        <DialogContent>
+        <ModalBody>
           {/* Métricas rápidas do evento selecionado */}
           <div className="grid grid-cols-3 gap-3 my-3">
             <div className="p-3 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] text-center">
@@ -1516,65 +1552,33 @@ export default function EventsPage() {
               </table>
             </div>
           )}
-        </DialogContent>
-        <DialogActions className="px-6 pb-4">
-          <button
-            type="button"
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            variant="secondary"
             onClick={() => setGuestsModalOpen(false)}
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--surface-hover)] hover:bg-[var(--surface-border)] text-[var(--text)] border border-[var(--surface-border)] transition-colors cursor-pointer"
+            className="w-full sm:w-auto"
           >
             Fechar
-          </button>
-        </DialogActions>
-      </Dialog>
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
 
       {/* ======================================================== */}
       {/* DIÁLOGO: CONFIRMAR EXCLUSÃO DE EVENTO                     */}
       {/* ======================================================== */}
-      <Dialog
+      <ConfirmModal
         open={deleteDialogOpen}
         onClose={() => !deleting && setDeleteDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--surface-border)",
-            p: 1,
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: "var(--text)", fontWeight: 700 }}>
-          Confirmar Exclusão
-        </DialogTitle>
-        <DialogContent>
-          <p className="text-sm text-[var(--muted)]">
-            Tem certeza que deseja excluir o evento{" "}
-            <strong className="text-[var(--text)]">{eventToDelete?.title}</strong>? Esta
-            ação cancelará todas as inscrições registradas nele.
-          </p>
-        </DialogContent>
-        <DialogActions className="gap-2 px-6 pb-4">
-          <button
-            type="button"
-            onClick={() => setDeleteDialogOpen(false)}
-            disabled={deleting}
-            className="px-4 py-2 text-xs font-semibold rounded-xl text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] transition-colors cursor-pointer"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteEvent}
-            disabled={deleting}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
-          >
-            {deleting ? <CircularProgress size={14} sx={{ color: "white" }} /> : "Excluir Evento"}
-          </button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleDeleteEvent}
+        title="Excluir Evento"
+        description="Tem certeza que deseja excluir este evento? Esta ação cancelará todas as inscrições registradas nele."
+        itemName={eventToDelete?.title}
+        confirmText="Excluir Evento"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   );
 }

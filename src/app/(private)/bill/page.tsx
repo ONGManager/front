@@ -7,12 +7,8 @@ import {
   type Financial,
   type FinancialSummary,
 } from "@/src/services/financialService";
-import Button from "@mui/material/Button";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Button,
   TextField,
   Select,
   MenuItem,
@@ -20,6 +16,14 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  ConfirmModal,
+} from "@/src/components/Modal";
 import { toast } from "sonner";
 
 export default function Bill() {
@@ -268,7 +272,7 @@ export default function Bill() {
 
   const isEditMode = modalMode === "edit";
 
-  const handleModalClose = (_event: unknown, reason?: string) => {
+  const handleModalClose = (_event?: unknown, reason?: string) => {
     if (submitting) {
       return;
     }
@@ -555,26 +559,29 @@ export default function Bill() {
       </div>
 
       {/* Modal de adicionar conta */}
-      <Dialog
+      <Modal
         open={modalOpen}
         onClose={handleModalClose}
         maxWidth="md"
-        fullWidth
-        disableEscapeKeyDown={submitting}
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 2,
-            border: "1px solid var(--surface-border)",
-            minHeight: 400,
-          },
-        }}
+        preventClose={submitting}
       >
-        <DialogTitle sx={{ color: "var(--text)" }}>
-          {isEditMode ? "Editar Conta" : "Adicionar Nova Conta"}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
+        <ModalHeader
+          title={isEditMode ? "Editar Conta" : "Adicionar Nova Conta"}
+          subtitle={
+            isEditMode
+              ? "Modifique os valores, categoria e status do lançamento financeiro."
+              : "Registre um novo lançamento de receita ou despesa para a organização."
+          }
+          iconVariant="purple"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+          onClose={handleModalClose}
+          closeDisabled={submitting}
+        />
+        <ModalBody>
           <div className="mt-4">
             <div className="flex flex-col gap-5">
               <TextField
@@ -777,88 +784,46 @@ export default function Bill() {
               />
             </div>
           </div>
-        </DialogContent>
-        <DialogActions className="gap-2 px-4 pb-4">
-          <Button
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            type="button"
+            variant="secondary"
             onClick={closeModal}
             disabled={submitting}
-            className="bg-red-600! hover:bg-red-700! text-white! text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto"
           >
             Cancelar
-          </Button>
-          <Button
+          </ModalButton>
+          <ModalButton
+            type="button"
+            variant="primary"
             onClick={handleSubmit}
-            disabled={submitting}
-            className="bg-green-600! hover:bg-green-700! text-white! text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            loading={submitting}
+            className="w-full sm:w-auto"
           >
-            {submitting ? (
-              <span className="flex items-center gap-2">
-                <CircularProgress size={16} color="inherit" />
-                Salvando...
-              </span>
-            ) : isEditMode ? (
-              "Salvar alterações"
-            ) : (
-              "Adicionar"
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
+            {isEditMode ? "Salvar Alterações" : "Adicionar Movimento"}
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
 
-      <Dialog
+      {/* Modal de Excluir Movimento */}
+      <ConfirmModal
         open={deleteDialogOpen}
         onClose={closeDeleteDialog}
-        disableEscapeKeyDown={deleting}
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 2,
-            border: "1px solid var(--surface-border)",
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: "var(--text)" }}>
-          Excluir movimento
-        </DialogTitle>
-        <DialogContent>
-          <p className="text-[var(--text)]">
-            Tem certeza que deseja excluir esse movimento? Essa ação não pode
-            ser desfeita.
-          </p>
-          {financialToDelete ? (
-            <p className="mt-3 text-sm text-[var(--muted)]">
-              {financialToDelete.description} -{" "}
-              {formatCurrency(Number(financialToDelete.amount))}
-            </p>
-          ) : null}
-        </DialogContent>
-        <DialogActions className="gap-2 px-4 pb-4">
-          <Button
-            onClick={closeDeleteDialog}
-            disabled={deleting}
-            className="bg-[var(--surface-hover)] text-[var(--text)] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[var(--accent-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDelete}
-            color="error"
-            variant="contained"
-            disabled={deleting}
-            className="bg-[var(--danger)] hover:bg-[var(--danger-soft)] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {deleting ? (
-              <span className="flex items-center gap-2">
-                <CircularProgress size={16} color="inherit" />
-                Excluindo...
-              </span>
-            ) : (
-              "Excluir"
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleDelete}
+        title="Excluir Movimento"
+        description="Tem certeza que deseja excluir esse movimento financeiro? Essa ação não pode ser desfeita."
+        itemName={
+          financialToDelete
+            ? `${financialToDelete.description} - ${formatCurrency(Number(financialToDelete.amount))}`
+            : undefined
+        }
+        confirmText="Excluir Movimento"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   );
 }

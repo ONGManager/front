@@ -4,13 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   CircularProgress,
 } from "@mui/material";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  ConfirmModal,
+} from "@/src/components/Modal";
 import { toast } from "sonner";
 import {
   getOngMembersApi,
@@ -451,257 +454,213 @@ export default function MembersPage() {
       </div>
 
       {/* MODAL: Gerar e Compartilhar Link de Convite */}
-      <Dialog
+      <Modal
         open={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
         maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--card-border)",
-            p: 1,
-          },
-        }}
       >
-        <DialogTitle sx={{ color: "var(--text)", fontWeight: 700, pb: 1 }}>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-            </div>
-            <span>Convidar Membro via Link</span>
-          </div>
-        </DialogTitle>
-        <DialogContent>
-          <p className="text-sm text-[var(--muted)] mb-4">
-            Envie este link para quem você deseja convidar. Ao acessar o link, o voluntário poderá aceitar o convite e fazer parte da organização.
-          </p>
-
+        <ModalHeader
+          title="Convidar Membro via Link"
+          subtitle="Gere um link seguro para permitir a entrada de novos voluntários na organização."
+          iconVariant="purple"
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          }
+          onClose={() => setInviteModalOpen(false)}
+        />
+        <ModalBody className="space-y-4">
           {generatingInvite ? (
-            <div className="flex items-center justify-center py-8 gap-3">
-              <CircularProgress size={24} sx={{ color: "var(--accent)" }} />
-              <span className="text-sm text-[var(--muted)]">Gerando link seguro...</span>
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <CircularProgress size={28} sx={{ color: "var(--accent)" }} />
+              <span className="text-sm font-medium text-[var(--muted)]">Gerando link seguro...</span>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={inviteUrl}
-                  className="flex-1 px-3 py-2.5 bg-[var(--input)] border border-[var(--input-border)] rounded-lg text-sm text-[var(--text)] select-all focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <Button
-                  variant="contained"
-                  onClick={handleCopyInviteLink}
-                  className={`font-semibold normal-case px-4 py-2.5 rounded-lg shrink-0 transition-all ${
-                    copied
-                      ? "bg-emerald-600! hover:bg-emerald-700! text-white"
-                      : "bg-purple-600! hover:bg-purple-700! text-white"
-                  }`}
-                  startIcon={
-                    copied ? (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+            <>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
+                  Link de Convite
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={inviteUrl}
+                    className="flex-1 h-11 px-3.5 bg-[var(--input)] border border-[var(--input-border)] rounded-xl text-sm text-[var(--text)] select-all focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyInviteLink}
+                    className={`h-11 px-4 rounded-xl font-semibold text-sm shrink-0 transition-all flex items-center gap-2 cursor-pointer ${
+                      copied
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "bg-purple-600 hover:bg-purple-700 text-white"
+                    }`}
+                  >
+                    {copied ? (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Copiado!</span>
+                      </>
                     ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
-                    )
-                  }
-                >
-                  {copied ? "Copiado!" : "Copiar Link"}
-                </Button>
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        <span>Copiar Link</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <div className="bg-purple-50 dark:bg-purple-950/30 p-3 rounded-lg border border-purple-200 dark:border-purple-900/40 text-xs text-purple-700 dark:text-purple-300">
-                <p className="font-semibold mb-1">Informações do convite:</p>
-                <ul className="list-disc pl-4 space-y-0.5">
+              <div className="bg-purple-50 dark:bg-purple-950/30 p-3.5 rounded-xl border border-purple-200 dark:border-purple-900/40 text-xs text-purple-700 dark:text-purple-300 leading-relaxed">
+                <p className="font-bold mb-1.5 flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Informações do convite:
+                </p>
+                <ul className="list-disc pl-4 space-y-1">
                   <li>O convite concede a função inicial de <strong>Voluntário</strong>.</li>
                   <li>Você poderá alterar o cargo do voluntário a qualquer momento nesta tela.</li>
                   <li>Se a pessoa já foi um membro inativado, aceitar o convite reativará o acesso dela.</li>
                 </ul>
               </div>
-            </div>
+            </>
           )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            variant="secondary"
             onClick={() => setInviteModalOpen(false)}
-            className="text-[var(--text)] normal-case font-medium hover:bg-[var(--surface-hover)]"
+            className="w-full sm:w-auto"
           >
             Fechar
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
 
       {/* MODAL: Confirmação de Inativação (Regra de Negócio: Não Deletar, Apenas Inativar) */}
-      <Dialog
+      <ConfirmModal
         open={inactivateModalOpen}
         onClose={() => !inactivating && setInactivateModalOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--card-border)",
-            p: 1,
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: "var(--text)", fontWeight: 700 }}>
-          <div className="flex items-center gap-2 text-red-600">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>Inativar Membro</span>
-          </div>
-        </DialogTitle>
-        <DialogContent>
-          <p className="text-sm text-[var(--muted)] mb-3">
-            Tem certeza que deseja inativar{" "}
-            <strong className="text-[var(--text)]">
-              {memberToInactivate?.user.name}
-            </strong>
-            ?
-          </p>
-          <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg border border-amber-200 dark:border-amber-900/40 text-xs text-amber-800 dark:text-amber-300 space-y-1">
-            <p className="font-semibold">Importante:</p>
-            <p>
-              O membro <strong>não será excluído</strong> do banco de dados, mas perderá o acesso imediato à ONG. O histórico de tarefas e registros permanecerá intacto.
-            </p>
-          </div>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button
-            onClick={() => setInactivateModalOpen(false)}
-            disabled={inactivating}
-            className="text-[var(--text)] normal-case font-medium hover:bg-[var(--surface-hover)]"
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleConfirmInactivate}
-            disabled={inactivating}
-            className="bg-red-600! hover:bg-red-700! text-white normal-case font-medium px-4"
-          >
-            {inactivating ? "Inativando..." : "Sim, Inativar"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleConfirmInactivate}
+        title="Inativar Membro"
+        description={
+          <span>
+            Tem certeza que deseja inativar o acesso de{" "}
+            <strong className="text-[var(--text)]">{memberToInactivate?.user.name}</strong>?
+          </span>
+        }
+        warningNote={
+          <span>
+            <strong>Importante:</strong> O membro não será excluído do banco de dados, mas perderá o acesso imediato à ONG. O histórico de tarefas e registros permanecerá intacto.
+          </span>
+        }
+        confirmText="Sim, Inativar"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={inactivating}
+      />
 
       {/* MODAL: Cadastrar Voluntário Manualmente */}
-      <Dialog
+      <Modal
         open={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
         maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: "var(--surface)",
-            color: "var(--text)",
-            borderRadius: 3,
-            border: "1px solid var(--surface-border)",
-            p: 1,
-          },
-        }}
+        preventClose={submitting}
       >
-        <DialogTitle sx={{ color: "var(--text)", fontWeight: 700 }}>
-          Cadastrar Novo Voluntário
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <p className="text-xs text-[var(--muted)] mb-4">
-            Crie um login direto para o voluntário acessar a ONG com a senha temporária definida abaixo.
-          </p>
-          <div className="space-y-4">
-            <TextField
-              label="Nome Completo"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              required
-              sx={{
-                "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
-                "& .MuiOutlinedInput-root": {
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 2,
-                  "& fieldset": { borderColor: "var(--input-border)" },
-                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
-                },
-              }}
-            />
-            <TextField
-              label="E-mail"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              required
-              sx={{
-                "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
-                "& .MuiOutlinedInput-root": {
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 2,
-                  "& fieldset": { borderColor: "var(--input-border)" },
-                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
-                },
-              }}
-            />
-            <TextField
-              label="Senha de Acesso"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-              required
-              helperText="Mínimo de 6 caracteres"
-              FormHelperTextProps={{ sx: { color: "var(--muted)" } }}
-              sx={{
-                "& .MuiInputLabel-root": { color: "var(--muted)" },
-                "& .MuiInputLabel-root.Mui-focused": { color: "var(--text)" },
-                "& .MuiOutlinedInput-root": {
-                  color: "var(--text)",
-                  bgcolor: "var(--input)",
-                  borderRadius: 2,
-                  "& fieldset": { borderColor: "var(--input-border)" },
-                  "&:hover fieldset": { borderColor: "var(--input-hover)" },
-                  "&.Mui-focused fieldset": { borderColor: "var(--input-ring)" },
-                },
-              }}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions className="gap-2 px-6 pb-4">
-          <Button
-            onClick={() => setModalOpen(false)}
-            disabled={submitting}
-            className="text-[var(--text)] normal-case font-medium hover:bg-[var(--surface-hover)]"
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleCreateVolunteer}
-            variant="contained"
-            className="bg-purple-600! hover:bg-purple-700! text-white normal-case font-medium px-5"
-            disabled={submitting}
-          >
-            {submitting ? "Cadastrando..." : "Cadastrar Voluntário"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreateVolunteer();
+          }}
+          className="flex flex-col"
+        >
+          <ModalHeader
+            title="Cadastrar Novo Voluntário"
+            subtitle="Crie um login direto para o voluntário acessar a ONG com a senha temporária definida abaixo."
+            iconVariant="purple"
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            }
+            onClose={() => setModalOpen(false)}
+            closeDisabled={submitting}
+          />
+          <ModalBody className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
+                Nome Completo <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Ex: Carlos Eduardo da Silva"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full h-11 px-3.5 rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
+                E-mail de Acesso <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                required
+                placeholder="Ex: voluntario@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-11 px-3.5 rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
+                Senha Temporária <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="Mínimo de 6 caracteres"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
+                className="w-full h-11 px-3.5 rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all shadow-2xs"
+              />
+              <p className="text-[11px] text-[var(--muted)] mt-1.5">
+                O voluntário poderá alterar esta senha posteriormente nas configurações de perfil.
+              </p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <ModalButton
+              type="button"
+              variant="secondary"
+              onClick={() => setModalOpen(false)}
+              disabled={submitting}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </ModalButton>
+            <ModalButton
+              type="submit"
+              variant="primary"
+              loading={submitting}
+              className="w-full sm:w-auto"
+            >
+              Cadastrar Voluntário
+            </ModalButton>
+          </ModalFooter>
+        </form>
+      </Modal>
     </div>
   );
 }
