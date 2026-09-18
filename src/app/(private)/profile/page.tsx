@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getMeApi, updateProfileApi } from "@/src/services/authService";
-import { getOngApi } from "@/src/services/ongService";
+import { getOngApi, getMyOngsApi } from "@/src/services/ongService";
+import { aplicarMascaraCNPJ } from "@/schema";
 import LoadingScreen from "@/src/components/LoadingScreen";
 import editProfileIcon from "../../../assets/editprofile.svg";
 import { toast } from "sonner";
@@ -49,13 +50,24 @@ export default function Profile() {
           }));
         }
 
-        const selectedOngId = localStorage.getItem("selectedOngId");
+        let selectedOngId = typeof window !== "undefined" ? localStorage.getItem("selectedOngId") : null;
+        if (!selectedOngId) {
+          const myOngs = await getMyOngsApi();
+          if (myOngs && myOngs.length > 0) {
+            const firstOngId = myOngs[0].id;
+            selectedOngId = firstOngId;
+            localStorage.setItem("selectedOngId", firstOngId);
+          }
+        }
+
         if (selectedOngId) {
           const ongData = await getOngApi(selectedOngId);
+          const rawCnpj = (ongData.cnpj || "").replace(/\D/g, "");
+          const formattedCnpj = rawCnpj ? aplicarMascaraCNPJ(rawCnpj) : (ongData.cnpj || "Não cadastrado");
           setFormData((prev) => ({
             ...prev,
             ongName: ongData.name || "",
-            cnpj: ongData.cnpj || "",
+            cnpj: formattedCnpj,
             role: ongData.userRole || loadedUser?.role || "",
           }));
         }
@@ -308,10 +320,10 @@ export default function Profile() {
               <span className="text-sm font-medium text-[var(--text)] block mb-1">CNPJ da ONG</span>
               <input
                 type="text"
-                value={formData.cnpj}
+                value={formData.cnpj || "Não cadastrado"}
                 readOnly
                 disabled
-                className="w-full max-w-[384px] h-10 bg-[var(--surface-hover)] text-[var(--muted)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 cursor-not-allowed opacity-80"
+                className="w-full max-w-[384px] h-10 bg-[var(--surface-hover)] text-[var(--text)] rounded-md border-2 border-[var(--surface-border)] px-3 py-2 cursor-not-allowed opacity-90 font-medium"
               />
             </div>
           </div>
