@@ -17,7 +17,7 @@ export const aplicarMascaraCNPJ = (valor: string): string => {
 };
 
 // Validação de senha forte
-const validarSenhaForte = (senha: string) => {
+export const validarSenhaForte = (senha: string) => {
   const temMaiuscula = /[A-Z]/.test(senha);
   const temMinuscula = /[a-z]/.test(senha);
   const temNumero = /\d/.test(senha);

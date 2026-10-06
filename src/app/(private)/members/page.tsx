@@ -24,6 +24,7 @@ import {
   generateInviteApi,
 } from "@/src/services/ongService";
 import { getMeApi } from "@/src/services/authService";
+import { validarSenhaForte } from "@/schema";
 
 interface Member {
   id: string;
@@ -113,8 +114,8 @@ export default function MembersPage() {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("A senha deve conter no mínimo 6 caracteres");
+    if (password.length < 8 || password.length > 40 || !validarSenhaForte(password)) {
+      toast.error("A senha deve ter de 8 a 40 caracteres, com letra maiúscula, minúscula, número e caractere especial");
       return;
     }
 
@@ -629,10 +630,10 @@ export default function MembersPage() {
               <input
                 type="password"
                 required
-                placeholder="Mínimo de 6 caracteres"
+                placeholder="Mínimo de 8 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                minLength={6}
+                minLength={8}
                 className="w-full h-11 px-3.5 rounded-xl bg-[var(--input)] border border-[var(--input-border)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all shadow-2xs"
               />
               <p className="text-[11px] text-[var(--muted)] mt-1.5">

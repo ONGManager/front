@@ -24,6 +24,7 @@ import {
   ModalButton,
   ConfirmModal,
 } from "@/src/components/Modal";
+import { getOngApi } from "@/src/services/ongService";
 import { toast } from "sonner";
 
 export default function Bill() {
@@ -40,6 +41,10 @@ export default function Bill() {
     "all" | "pendente" | "confirmado"
   >("all");
   const [ongId, setOngId] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
+
+  // Apenas administradores e gestores financeiros podem criar, editar e excluir lançamentos
+  const canManage = userRole === "admin" || userRole === "finance_manager";
 
   // Estados do Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -76,6 +81,15 @@ export default function Bill() {
     setOngId(storedOngId);
     loadData(storedOngId);
   }, [router, filterType, filterStatus]);
+
+  // Carrega o cargo do usuário na ONG selecionada
+  useEffect(() => {
+    const storedOngId = localStorage.getItem("selectedOngId");
+    if (!storedOngId) return;
+    getOngApi(storedOngId)
+      .then((ongData) => setUserRole(ongData.userRole))
+      .catch(() => setUserRole(""));
+  }, []);
 
   // Função única para buscar dados do backend
   const loadData = async (currentOngId: string) => {
@@ -426,18 +440,20 @@ export default function Bill() {
             {exportingFormat === "pdf" ? "Exportando PDF..." : "Exportar PDF"}
           </Button>
 
-          <Button
-            variant="contained"
-            onClick={openCreateModal}
-            className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer normal-case font-medium text-xs sm:text-sm py-1.5 px-4"
-            startIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            }
-          >
-            Adicionar Conta
-          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              onClick={openCreateModal}
+              className="bg-purple-600! hover:bg-purple-700! text-white cursor-pointer normal-case font-medium text-xs sm:text-sm py-1.5 px-4"
+              startIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              }
+            >
+              Adicionar Conta
+            </Button>
+          )}
         </div>
       </div>
 
@@ -531,25 +547,29 @@ export default function Bill() {
                     {financial.notes || "-"}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => openEditModal(financial)}
-                        className="bg-blue-500! hover:bg-blue-700! text-white!"
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => openDeleteDialog(financial)}
-                        className="bg-red-500! hover:bg-red-700! text-white!"
-                      >
-                        Excluir
-                      </Button>
-                    </div>
+                    {canManage ? (
+                      <div className="flex gap-2">
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => openEditModal(financial)}
+                          className="bg-blue-500! hover:bg-blue-700! text-white!"
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => openDeleteDialog(financial)}
+                          className="bg-red-500! hover:bg-red-700! text-white!"
+                        >
+                          Excluir
+                        </Button>
+                      </div>
+                    ) : (
+                      <span className="text-[var(--muted)]">-</span>
+                    )}
                   </td>
                 </tr>
               ))

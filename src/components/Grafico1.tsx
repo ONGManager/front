@@ -63,7 +63,7 @@ export default function Grafico1({ ongId }: Grafico1Props) {
 
     for (const item of financials) {
       const date = new Date(item.date);
-      if (date.getFullYear() !== currentYear) {
+      if (date.getFullYear() !== currentYear || item.status !== "confirmado") {
         continue;
       }
 

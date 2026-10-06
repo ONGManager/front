@@ -27,6 +27,7 @@ export default function Register() {
   const [timeLeft, setTimeLeft] = useState<number>(600); // 10 minutos (600s)
   const [resendCooldown, setResendCooldown] = useState<number>(0);
   const [isSendingCode, setIsSendingCode] = useState<boolean>(false);
+  const [codeSentTo, setCodeSentTo] = useState<string>("");
 
   const {
     register,
@@ -115,6 +116,12 @@ export default function Register() {
     const isValid = await trigger(["nomeResponsavel", "email", "password", "confirmPassword"]);
     if (!isValid) return;
 
+    // Código ainda válido para o mesmo e-mail dentro do cooldown: volta ao Passo 3 sem reenviar
+    if (getValues("email") === codeSentTo && resendCooldown > 0) {
+      setStep(3);
+      return;
+    }
+
     try {
       setIsSendingCode(true);
       const email = getValues("email");
@@ -122,6 +129,7 @@ export default function Register() {
 
       await sendVerificationCodeApi(email, ong);
 
+      setCodeSentTo(email);
       setTimeLeft(600); // 10 minutos
       setResendCooldown(60); // 60s cooldown para reenviar
       setVerificationCode(["", "", "", "", "", ""]);

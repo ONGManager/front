@@ -7,6 +7,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { toast } from "sonner";
 import LoginPadrao from "../../../components/Login";
 import { resetPasswordApi } from "../../../services/authService";
+import { validarSenhaForte } from "@/schema";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -58,8 +59,8 @@ function ResetPasswordForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter no mínimo 6 caracteres.");
+    if (newPassword.length < 8 || newPassword.length > 40 || !validarSenhaForte(newPassword)) {
+      toast.error("A nova senha deve ter de 8 a 40 caracteres, com letra maiúscula, minúscula, número e caractere especial.");
       return;
     }
 
@@ -105,7 +106,7 @@ function ResetPasswordForm() {
               <div className="relative w-full">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
