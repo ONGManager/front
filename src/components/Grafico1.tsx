@@ -53,12 +53,10 @@ export default function Grafico1({ ongId }: Grafico1Props) {
     loadData();
   }, [ongId]);
 
-  const seriesData = useMemo(() => {
-    if (financials.length === 0) {
-      return [];
-    }
-
-    const monthsMap = new Map<string, number>();
+  // Categorias e valores saem do mesmo mapa, indexado pelo número do mês (0-11),
+  // para que rótulos e barras fiquem alinhados e em ordem cronológica.
+  const { categories, seriesData } = useMemo(() => {
+    const monthsMap = new Map<number, number>();
     const currentYear = new Date().getFullYear();
 
     for (const item of financials) {
@@ -72,37 +70,20 @@ export default function Grafico1({ ongId }: Grafico1Props) {
         continue;
       }
 
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const currentAmount = monthsMap.get(monthKey) ?? 0;
+      const month = date.getMonth();
+      const currentAmount = monthsMap.get(month) ?? 0;
       monthsMap.set(
-        monthKey,
+        month,
         currentAmount + (item.type === "receita" ? amount : -amount),
       );
     }
 
-    const sorted = Array.from(monthsMap.entries()).sort((a, b) =>
-      a[0].localeCompare(b[0]),
-    );
+    const sorted = Array.from(monthsMap.entries()).sort((a, b) => a[0] - b[0]);
 
-    return sorted.map(([, value]) => Number(Number(value).toFixed(2)));
-  }, [financials]);
-
-  const categories = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-    const months = new Set<string>();
-
-    for (const item of financials) {
-      const date = new Date(item.date);
-      if (date.getFullYear() !== currentYear) continue;
-      months.add(`${date.getFullYear()}-${date.getMonth()}`);
-    }
-
-    return Array.from(months)
-      .sort()
-      .map((value) => {
-        const month = Number(value.split("-")[1]);
-        return monthNames[month];
-      });
+    return {
+      categories: sorted.map(([month]) => monthNames[month]),
+      seriesData: sorted.map(([, value]) => Number(value.toFixed(2))),
+    };
   }, [financials]);
 
   const options: Highcharts.Options = {
