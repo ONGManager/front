@@ -562,7 +562,13 @@ export default function KanbanPage() {
               <MenuItem value="">Ninguém (Não atribuído)</MenuItem>
               {members.map((m) => (
                 <MenuItem key={m.user.id} value={m.user.id}>
-                  {m.user.name} ({m.role === "admin" ? "Admin" : "Voluntário"})
+                  {m.user.name} (
+                  {m.role === "admin"
+                    ? "Admin"
+                    : m.role === "finance_manager"
+                      ? "Gestor Financeiro"
+                      : "Voluntário"}
+                  )
                 </MenuItem>
               ))}
             </Select>

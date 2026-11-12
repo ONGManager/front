@@ -196,7 +196,11 @@ export default function Header({ onOpenSidebar }: HeaderProps) {
               {userName}
             </span>
             <span className="text-[11px] text-[var(--muted)]">
-              {userRole === "admin" ? "Administrador" : "Voluntário"}
+              {userRole === "admin"
+                ? "Administrador"
+                : userRole === "finance_manager"
+                  ? "Gestor Financeiro"
+                  : "Voluntário"}
             </span>
           </div>
           <div className="relative" ref={profileMenuRef}>

@@ -143,7 +143,7 @@ export default function Profile() {
         name: updatedUser.name,
         email: updatedUser.email,
         phone: updatedUser.phone || "",
-        role: updatedUser.role,
+        // Mantém o cargo na ONG; updatedUser.role é o papel global ("user")
         oldPassword: "",
         newPassword: "",
       }));
