@@ -285,7 +285,12 @@ export default function EventsPage() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(19, 0, 0, 0);
-    const formatted = tomorrow.toISOString().slice(0, 16);
+    // datetime-local espera horário local, não UTC
+    const formatted = new Date(
+      tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .slice(0, 16);
     setDate(formatted);
     setLocation("");
     setMaxTickets(50);

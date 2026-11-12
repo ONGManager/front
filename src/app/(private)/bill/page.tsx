@@ -27,6 +27,13 @@ import {
 import { getOngApi } from "@/src/services/ongService";
 import { toast } from "sonner";
 
+// Data no fuso local (YYYY-MM-DD) para inputs type="date"; toISOString usaria UTC e pularia de dia à noite
+function toLocalDateInput(value: Date | string = new Date()) {
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export default function Bill() {
   const router = useRouter();
 
@@ -66,7 +73,7 @@ export default function Bill() {
     type: "despesa" as "receita" | "despesa",
     amount: "",
     category: "outro",
-    date: new Date().toISOString().split("T")[0],
+    date: toLocalDateInput(),
     status: "confirmado" as "pendente" | "confirmado",
     notes: "",
   });
@@ -121,7 +128,7 @@ export default function Bill() {
       type: "despesa",
       amount: "",
       category: "outro",
-      date: new Date().toISOString().split("T")[0],
+      date: toLocalDateInput(),
       status: "confirmado",
       notes: "",
     });
@@ -144,7 +151,7 @@ export default function Bill() {
         String(Math.round(Number(financial.amount) * 100)),
       ),
       category: financial.category,
-      date: new Date(financial.date).toISOString().split("T")[0],
+      date: toLocalDateInput(financial.date),
       status: financial.status,
       notes: financial.notes || "",
     });
@@ -215,7 +222,8 @@ export default function Bill() {
         type: formData.type,
         amount: parseMoneyInput(formData.amount),
         category: formData.category,
-        date: new Date(formData.date).toISOString(),
+        // Meio-dia local evita que a data volte um dia ao converter para UTC
+        date: new Date(`${formData.date}T12:00:00`).toISOString(),
         notes: formData.notes || undefined,
       };
 

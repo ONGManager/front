@@ -148,7 +148,16 @@ export default function KanbanPage() {
     setTitle(task.title);
     setDescription(task.description || "");
     setPriority(task.priority);
-    setDeadline(task.deadline ? task.deadline.split("T")[0] : "");
+    setDeadline(
+      task.deadline
+        ? new Date(
+            new Date(task.deadline).getTime() -
+              new Date(task.deadline).getTimezoneOffset() * 60000,
+          )
+            .toISOString()
+            .split("T")[0]
+        : "",
+    );
     setAssignedToId(task.assignedTo?.id || "");
     setModalOpen(true);
   };
@@ -165,7 +174,8 @@ export default function KanbanPage() {
           title,
           description,
           priority,
-          deadline: deadline ? new Date(deadline).toISOString() : null,
+          // Prazo às 18h locais evita que a data volte um dia ao converter para UTC
+          deadline: deadline ? new Date(`${deadline}T18:00:00`).toISOString() : null,
           assignedToId: assignedToId ? assignedToId : null,
         };
         console.log("[KANBAN_FORM][UPDATE] payload:", payload);
@@ -181,7 +191,8 @@ export default function KanbanPage() {
           title,
           description,
           priority,
-          deadline: deadline ? new Date(deadline).toISOString() : null,
+          // Prazo às 18h locais evita que a data volte um dia ao converter para UTC
+          deadline: deadline ? new Date(`${deadline}T18:00:00`).toISOString() : null,
           assignedToId: assignedToId ? assignedToId : null,
         };
         console.log("[KANBAN_FORM][CREATE] payload:", payload);
