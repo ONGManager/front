@@ -1,7 +1,9 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { logoutApi } from "../services/authService";
+import Logo from "../assets/Logo.png";
 
 interface SidebarProps {
   userRole?: string;
@@ -62,14 +64,16 @@ export default function Sidebar({ userRole = "colaborador", isOpen = false, onCl
         {/* Logo */}
         <div className="flex items-center justify-between px-2 pb-4 mb-2 border-b border-[var(--surface-border)]">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[var(--surface)] flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-[var(--accent)]"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-              </svg>
+            {/* Símbolo da logo: recorte da parte esquerda de Logo.png, em fundo branco para ler bem nos dois temas */}
+            <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shrink-0 shadow-sm">
+              <div className="w-[30px] h-[30px] overflow-hidden">
+                <Image
+                  src={Logo}
+                  alt="Logo ONG Manager"
+                  priority
+                  className="h-[30px] w-auto max-w-none"
+                />
+              </div>
             </div>
             <span className="text-[18px] font-semibold text-[var(--accent)] tracking-tight">
               ONG Manager

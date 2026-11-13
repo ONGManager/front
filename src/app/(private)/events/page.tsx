@@ -929,7 +929,7 @@ export default function EventsPage() {
           closeDisabled={submittingEvent}
         />
         <ModalBody>
-          <div className="space-y-4 mt-2">
+          <div className="flex flex-col gap-5 mt-2">
             <TextField
               label="Título do Evento *"
               value={title}
@@ -1069,7 +1069,7 @@ export default function EventsPage() {
             )}
 
             {/* SEÇÃO: PÁGINA DE DIVULGAÇÃO / LANDING PAGE */}
-            <div className="pt-2 border-t border-[var(--surface-border)] space-y-4">
+            <div className="pt-2 border-t border-[var(--surface-border)] flex flex-col gap-5">
               <div className="flex items-center justify-between p-4 rounded-2xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/70 dark:border-purple-800/50">
                 <div className="pr-4">
                   <h4 className="text-sm font-bold text-[var(--text)] flex items-center gap-2">
@@ -1092,7 +1092,7 @@ export default function EventsPage() {
               </div>
 
               {hasLandingPage && (
-                <div className="space-y-4 p-4 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
+                <div className="flex flex-col gap-5 p-4 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)]">
                   {/* Galeria de Templates */}
                   <TemplateSelector
                     selectedTemplate={landingTemplate}

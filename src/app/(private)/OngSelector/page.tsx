@@ -208,7 +208,7 @@ export default function OngSelector() {
             closeDisabled={createLoading}
           />
 
-          <ModalBody className="space-y-4">
+          <ModalBody className="flex flex-col gap-5 *:shrink-0">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
                 Nome da ONG <span className="text-red-500">*</span>

@@ -443,7 +443,7 @@ export default function KanbanPage() {
           }
           onClose={() => setModalOpen(false)}
         />
-        <ModalBody className="space-y-4">
+        <ModalBody className="flex flex-col gap-5 *:shrink-0">
           <TextField
             label="Título da Tarefa *"
             value={title}

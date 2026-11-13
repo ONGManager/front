@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* As classes dark: seguem o tema escolhido no app (data-theme), não o tema do sistema operacional */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --bg: #f3f4f6;
   --surface: #dedbdb;
@@ -8,7 +11,7 @@
   --divider: #f3f4f6;
   --text: #111827;
   --muted: #17191d;
-  --icon: #6b7280;
+  --icon: #374151;
   --accent: #7c3aed;
   --accent-soft: #c7bff1;
   --accent-border: #c4b5fd;

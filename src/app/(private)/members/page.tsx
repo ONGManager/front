@@ -471,7 +471,7 @@ export default function MembersPage() {
           }
           onClose={() => setInviteModalOpen(false)}
         />
-        <ModalBody className="space-y-4">
+        <ModalBody className="flex flex-col gap-5 *:shrink-0">
           {generatingInvite ? (
             <div className="flex flex-col items-center justify-center py-10 gap-3">
               <CircularProgress size={28} sx={{ color: "var(--accent)" }} />
@@ -594,7 +594,7 @@ export default function MembersPage() {
             onClose={() => setModalOpen(false)}
             closeDisabled={submitting}
           />
-          <ModalBody className="space-y-4">
+          <ModalBody className="flex flex-col gap-5 *:shrink-0">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1.5">
                 Nome Completo <span className="text-red-500">*</span>
